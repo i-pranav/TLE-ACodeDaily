@@ -117,25 +117,17 @@ def on_ready_event_once(bot):
 
     return register_on_ready
 
-
+#todo make ['all mods' ORZ] instead of just your name! 
 async def presence(bot):
     await bot.change_presence(activity=discord.Activity(
         type=discord.ActivityType.listening,
         name='your commands'))
     await asyncio.sleep(60)
 
-    @tasks.task(name='OrzUpdate',
-               waiter=tasks.Waiter.fixed_delay(5*60))
+    @tasks.task(name='OrzUpdate',waiter=tasks.Waiter.fixed_delay(5*60))
     async def presence_task(_):
-        while True:
-            target = random.choice([
-                member for member in bot.get_all_members()
-                if 'Purgatory' not in {role.name for role in member.roles}
-            ])
-            await bot.change_presence(activity=discord.Game(
-                name=f'{target.display_name} orz'))
-            await asyncio.sleep(10 * 60)
-
+        await bot.change_presence(activity=discord.Game(name=f'Pranav ORZ'))
+    
     presence_task.start()
 
 class TleHelp(commands.DefaultHelpCommand):
