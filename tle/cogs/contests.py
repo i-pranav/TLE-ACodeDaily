@@ -479,18 +479,12 @@ class Contests(commands.Cog):
         wait_msg = await ctx.channel.send('Generating ranklist, please wait...')
         ranklist = None
         try:
-            ranklist = cf_common.cache2.ranklist_cache.get_ranklist(contest)
+            ranklist = cf_common.cache2.ranklist_cache.get_ranklist(contest, show_official)
         except cache_system2.RanklistNotMonitored:
             if contest.phase == 'BEFORE':
                 raise ContestCogError(f'Contest `{contest.id} | {contest.name}` has not started')
             ranklist = await cf_common.cache2.ranklist_cache.generate_ranklist(contest.id, fetch_changes=True,
-                                                                               show_unofficial=show_official is False)
-
-        # for Edu rounds the cf api returns the unofficial participants as official as well.
-        # Hence we need to fix ranks for actual rated people
-        # Note that unofficial people still have their original ranks but they will be filtered out in show_ranklist
-        if show_official and "educational" in contest.name.lower():
-            handles, ranklist = self._filter_rated_only_contestant_data(handles, ranklist)
+                                                                               show_unofficial=not show_official)
 
         await wait_msg.delete()
         await ctx.channel.send(embed=self._make_contest_embed_for_ranklist(ranklist))
@@ -508,12 +502,8 @@ class Contests(commands.Cog):
             except rl.HandleNotPresentError:
                 continue
 
-            # TODO: It will throw an exception if this row corresponds to a team. At present ranklist doesnt show teams.
-            # It should be fixed in https://github.com/cheran-senthil/TLE/issues/72
-            # This probably is fixed, tho idk if that is what they meant when they made this
-
             # Database has correct handle ignoring case, update to it
-            handle = standing.party.teamName or standing.party.members[0].handle
+            handle = rl.Ranklist.get_ranklist_lookup_key(standing)
             if vc and standing.party.participantType != 'VIRTUAL':
                 continue
             handle_standings.append((handle, standing))
