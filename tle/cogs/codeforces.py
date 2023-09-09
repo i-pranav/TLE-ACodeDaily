@@ -291,10 +291,18 @@ class Codeforces(commands.Cog):
         embed = discord_common.cf_color_embed(description=msg)
         await ctx.send(f'Mashup contest for `{str_handles}`', embed=embed)
 
+
+
+
+    @commands.command(brief='Hard 75 challenge')
+    @cf_common.user_guard(group='hard75')
+    async def hard75(self,ctx,*args):
+        ctx.send('yeah the code is working fine!')
+
     @commands.command(brief='Challenge', aliases=['gitbad'],
                       usage='[delta=0|r=rating] [+tags...] [~tags...]')
     @cf_common.user_guard(group='gitgud')
-    async def gitgud2(self, ctx, *args):
+    async def gitgud(self, ctx, *args):
         """Gitgud: You can request a problem from the bots relative to your current rating with ;gitgud <delta>
         - It is also possible to request problems with a certain tag now but you get less points for it: ;gitgud <delta>|r=<rating> [+tags...] [~tags...]
         - After solving the problem you can claim gitgud points for it with ;gotgud
