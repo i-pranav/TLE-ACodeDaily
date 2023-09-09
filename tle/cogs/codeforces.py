@@ -297,7 +297,7 @@ class Codeforces(commands.Cog):
     @commands.command(brief='Hard 75 challenge')
     @cf_common.user_guard(group='hard75')
     async def hard75(self,ctx,*args):
-        ctx.send('yeah the code is working fine!')
+        await ctx.send('yeah the code is working fine!')
 
     @commands.command(brief='Challenge', aliases=['gitbad'],
                       usage='[delta=0|r=rating] [+tags...] [~tags...]')
