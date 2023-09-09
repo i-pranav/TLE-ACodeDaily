@@ -326,7 +326,11 @@ class Codeforces(commands.Cog):
             Hard75 DB schema
             identifier(user)  problem1 , problem2, Streak, lastSolveDate
                
+
             
+        TBD/future scope:
+            1. cron job to automatically mark completed challengs
+            2. add a certificate for people who complete their 75 days challenge
         """
         validSuffixes=["letsgo","completed","streak","leaderboard"]
         
