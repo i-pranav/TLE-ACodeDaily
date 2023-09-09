@@ -294,7 +294,7 @@ class Codeforces(commands.Cog):
     @commands.command(brief='Challenge', aliases=['gitbad'],
                       usage='[delta=0|r=rating] [+tags...] [~tags...]')
     @cf_common.user_guard(group='gitgud')
-    async def gitgud(self, ctx, *args):
+    async def gitgud2(self, ctx, *args):
         """Gitgud: You can request a problem from the bots relative to your current rating with ;gitgud <delta>
         - It is also possible to request problems with a certain tag now but you get less points for it: ;gitgud <delta>|r=<rating> [+tags...] [~tags...]
         - After solving the problem you can claim gitgud points for it with ;gotgud
