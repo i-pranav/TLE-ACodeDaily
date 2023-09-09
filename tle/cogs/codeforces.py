@@ -324,7 +324,7 @@ class Codeforces(commands.Cog):
 
 
             Hard75 DB schema
-            identifier(user)  problem1 , problem2, Streak, lastSolveDate
+            identifier(user)  problem1 , problem2, Streak, lastSolveDate, longesStreak
                
 
             
