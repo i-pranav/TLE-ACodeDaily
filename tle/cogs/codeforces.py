@@ -321,15 +321,24 @@ class Codeforces(commands.Cog):
 
         -- ;hard75 leaderboard
             returns the leaderboard!-> which player has the longest streak! 
+
+
+            Hard75 DB schema
+            identifier(user)  problem1 , problem2, Streak, lastSolveDate
+               
+            
         """
         validSuffixes=["letsgo","completed","streak","leaderboard"]
         
         if len(args)!=1:
-            return await ctx.send('Use the bot properly!')
-        
-        if args[0] not in validSuffixes:
+            await ctx.send('Use the bot properly!')
+            return 
+        elif args[0] not in validSuffixes:
             await ctx.send('invalid commands used!')
             return
+        """
+            Use individual functions for each of the above mentioned functionality so as to keep it modular
+        """
         userCommand=args[0]
         if(userCommand=="letsgo"):
             await ctx.send('letsgo command would get you the problems once coded!')
