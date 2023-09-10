@@ -73,7 +73,7 @@ class Hard75Challenge(commands.Cog):
         """
             Use individual functions for each of the above mentioned functionality so as to keep it modular
         """
-        await ctx.send("v1")
+        # await ctx.send("v2")
         handle, = await cf_common.resolve_handles(ctx, self.converter, ('!' + str(ctx.author),))
         user = cf_common.user_db.fetch_cf_user(handle)
         rating = round(user.effective_rating, -2)
