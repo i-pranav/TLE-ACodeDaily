@@ -66,12 +66,12 @@ class Codeforces(commands.Cog):
 
         #commenting below for testing purposes!
 
-        # if not p1_name in solved and not p2_name in solved:
-        #     raise CodeforcesCogError('You haven\'t completed either of the problems!.')
-        # if not p1_name in solved:
-        #     raise CodeforcesCogError('You haven\'t completed the problem1!!.')
-        # if not p2_name in solved:
-        #     raise CodeforcesCogError('You haven\'t completed the problem2!!.')
+        if not p1_name in solved and not p2_name in solved:
+            raise CodeforcesCogError('You haven\'t completed either of the problems!.')
+        if not p1_name in solved:
+            raise CodeforcesCogError('You haven\'t completed the problem1!!.')
+        if not p2_name in solved:
+            raise CodeforcesCogError('You haven\'t completed the problem2!!.')
         # else I need to update accordingly... 
         today=datetime.datetime.utcnow().strftime('%Y-%m-%d')
         assigned_date,last_update=cf_common.user_db.get_Hard75Date(user_id)
