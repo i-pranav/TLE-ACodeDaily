@@ -236,8 +236,6 @@ class Codeforces(commands.Cog):
             
         elif(userCommand=="completed"):
             await self._hard75_completed(ctx)
-            # the logic would require implementing the database first!
-            await ctx.send('completed command would get you your status once coded')
 
         elif(userCommand=="streak"):
             # the logic would require implementing the database first!
