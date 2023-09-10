@@ -129,13 +129,22 @@ class Codeforces(commands.Cog):
         res=cf_common.user_db.get_hard75_LeaderBoard()
         if res is None: 
             raise CodeforcesCogError('No One has completed anything as of now - leaderboard is empty!')
-        rank=1
+        names=[]
         for r in res:
             if(len(r)<5):
                 pass
-            embed.add_field(name=f'Rank {rank}',value=f"<@!{r}>")
-            rank+=1 
-        await ctx.send(f'The Hard75 leaderboard!', embed=embed)
+            names.push(f"<@!{r}>")
+        rankArr=[0]*len(names)
+        for i in range(0,5):
+            rankArr[i]=i+1
+                
+        embed=discord.Embed(
+        title="Leaderboard",
+        color=discord.Color.blue()
+        )
+        embed.add_field(name='Name',value=names,inline="true")
+        embed.add_field(name='Rank',value=rankArr,inline="true")
+        await ctx.send(embed=embed)
 
     async def _Hard75_streak(self,ctx):
         user_id=ctx.author.id
