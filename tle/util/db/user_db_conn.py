@@ -388,7 +388,7 @@ class UserDbConn:
             WHERE user_id = ? AND assigned_date = ?
         '''
         today=datetime.datetime.utcnow().strftime('%Y-%m-%d')
-        res = self.conn.execute(query1, (str(user_id),today)).fetchone()
+        res = self.conn.execute(query1, (user_id,today)).fetchone()
         if res is None: #need to start a new challenge! 
             return False
         return True
