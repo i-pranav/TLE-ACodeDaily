@@ -122,9 +122,9 @@ class UserDbConn:
             )
         ''')
         # used this to change the schema, commenting for future use (hope that it's never required though)
-        # self.conn.execute('''
-        #     DROP TABLE hard75_challenge
-        # ''')
+        self.conn.execute('''
+            DROP TABLE hard75_challenge
+        ''')
         self.conn.execute('''
             CREATE TABLE IF NOT EXISTS hard75_challenge(
             "user_id"                TEXT,
@@ -392,6 +392,7 @@ class UserDbConn:
         if res is None: #need to start a new challenge! 
             return False
         return True
+    
     def updateStreak_Hard75Challenge(self,user_id,current_streak,longest_streak):
         cur = self.conn.cursor()
         today=datetime.datetime.utcnow().strftime('%Y-%m-%d')

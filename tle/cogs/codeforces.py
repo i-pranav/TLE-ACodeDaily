@@ -131,6 +131,8 @@ class Codeforces(commands.Cog):
             raise CodeforcesCogError('No One has completed anything as of now - leaderboard is empty!')
         rank=1
         for r in res:
+            if(len(r)<5):
+                pass
             embed.add_field(name=f'Rank {rank}',value=f"<@!{r}>")
             rank+=1 
         await ctx.send(f'The Hard75 leaderboard!', embed=embed)
