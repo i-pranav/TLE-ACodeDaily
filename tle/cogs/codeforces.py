@@ -76,7 +76,7 @@ class Codeforces(commands.Cog):
         activeChallenge= cf_common.user_db.check_Hard75Challenge(user_id)
         if activeChallenge:     # problems are already there simply return from the DB 
             c1_id,p1_id,c2_id,p2_id=cf_common.user_db.get_Hard75Challenge(user_id)
-            self._hard75_Retried(ctx,handle,c1_id,p1_id,c2_id,p2_id)
+            await self._hard75_Retried(ctx,handle,c1_id,p1_id,c2_id,p2_id)
             return
         rating = round(user.effective_rating, -2)
         rating = max(800, rating)
