@@ -130,7 +130,7 @@ class Codeforces(commands.Cog):
             raise CodeforcesCogError('No One has completed anything as of now - leaderboard is empty!')
         names=[]
         for r in res:
-            if(r<1000):
+            if((r)<1000):
                 pass
             names.append(f"<@!{r}>")
         rankArr=[0]*len(names)
