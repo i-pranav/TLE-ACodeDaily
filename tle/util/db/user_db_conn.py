@@ -424,7 +424,7 @@ class UserDbConn:
             INSERT INTO hard75_challenge
             (user_id, handle, current_streak, longest_streak, c1_id, p1_id,p1_name, c2_id, p2_id,p2_name,p1_solved,p2_solved,assigned_date,last_updated)
             VALUES
-            (?, ?, ?, ?, ?, ?, ?, ?, ? ,?, ?, ?)
+            (?, ?, ?, ?, ?, ?, ?, ?, ? ,?, ?, ?, ?, ?)
         '''
         cur.execute(query3,(user_id,handle,0,0,c1_id,p1_id,p1_name,c2_id,p2_id,p2_name,0,0,today,0))
         if cur.rowcount!=1:
