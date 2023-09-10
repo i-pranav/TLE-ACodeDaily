@@ -295,76 +295,76 @@ class Codeforces(commands.Cog):
 
 
 
-    @commands.command(brief='Hard 75 challenge')
-    @cf_common.user_guard(group='hard75')
-    async def hard75(self,ctx,*args):
-        """
-        The logic behind the bot-
-        -- ;hard75 letsgo
-        Checks in DB if problems have already been assigned for the day 
-            if yes then 
-                if they have been solved then respond accordingly 
-                else respond back with the same problems 
-            else fetch, store (in DB) and return 2 problem (ideally from ACDLadders)
-                1. same level (rounded up) 
-                2. level+ 200 (rounded down)
+    # @commands.command(brief='Hard 75 challenge')
+    # @cf_common.user_guard(group='hard75')
+    # async def hard75(self,ctx,*args):
+    #     """
+    #     The logic behind the bot-
+    #     -- ;hard75 letsgo
+    #     Checks in DB if problems have already been assigned for the day 
+    #         if yes then 
+    #             if they have been solved then respond accordingly 
+    #             else respond back with the same problems 
+    #         else fetch, store (in DB) and return 2 problem (ideally from ACDLadders)
+    #             1. same level (rounded up) 
+    #             2. level+ 200 (rounded down)
         
-        -- ;hard75 completed
-        Checks if problems were assigned to the user on the same day
-            if yes then 
-                if they have solved the problems then
-                    1. update the Hard75 DB-> update streak count properly. 
-                    2. return with his streak count 
-            else respond appropriately
+    #     -- ;hard75 completed
+    #     Checks if problems were assigned to the user on the same day
+    #         if yes then 
+    #             if they have solved the problems then
+    #                 1. update the Hard75 DB-> update streak count properly. 
+    #                 2. return with his streak count 
+    #         else respond appropriately
         
-        -- ;hard75 streak
-            returns the streak of the current user!   
+    #     -- ;hard75 streak
+    #         returns the streak of the current user!   
 
-        -- ;hard75 leaderboard
-            returns the leaderboard!-> which player has the longest streak! 
+    #     -- ;hard75 leaderboard
+    #         returns the leaderboard!-> which player has the longest streak! 
 
 
-            Hard75 DB schema
-            identifier(user)  problem1 , problem2, Streak, lastSolveDate, longesStreak
+    #         Hard75 DB schema
+    #         identifier(user)  problem1 , problem2, Streak, lastSolveDate, longesStreak
                
 
             
-        TBD/future scope:
-            1. cron job to automatically mark completed challengs
-            2. add a certificate for people who complete their 75 days challenge
-        """
-        validSuffixes=["letsgo","completed","streak","leaderboard"]
+    #     TBD/future scope:
+    #         1. cron job to automatically mark completed challengs
+    #         2. add a certificate for people who complete their 75 days challenge
+    #     """
+    #     validSuffixes=["letsgo","completed","streak","leaderboard"]
         
-        if len(args)!=1:
-            await ctx.send('Use the bot properly!')
-            return 
-        elif args[0] not in validSuffixes:
-            await ctx.send('invalid commands used!')
-            return
-        """
-            Use individual functions for each of the above mentioned functionality so as to keep it modular
-        """
-        handles = handles or ('!' + str(ctx.author),)
-        handles = await cf_common.resolve_handles(ctx, self.converter, handles)
-        resp = [await cf.user.status(handle=handle) for handle in handles]
-        submissions = [sub for user in resp for sub in user]
-        solved = {sub.problem.name for sub in submissions}
-        info = await cf.user.info(handles=handles)
-        rating = int(round(sum(user.effective_rating for user in info) / len(handles), -2))
-        rating = max(800, rating)
-        rating = min(3500, rating)
+    #     if len(args)!=1:
+    #         await ctx.send('Use the bot properly!')
+    #         return 
+    #     elif args[0] not in validSuffixes:
+    #         await ctx.send('invalid commands used!')
+    #         return
+    #     """
+    #         Use individual functions for each of the above mentioned functionality so as to keep it modular
+    #     """
+    #     handles = handles or ('!' + str(ctx.author),)
+    #     handles = await cf_common.resolve_handles(ctx, self.converter, handles)
+    #     resp = [await cf.user.status(handle=handle) for handle in handles]
+    #     submissions = [sub for user in resp for sub in user]
+    #     solved = {sub.problem.name for sub in submissions}
+    #     info = await cf.user.info(handles=handles)
+    #     rating = int(round(sum(user.effective_rating for user in info) / len(handles), -2))
+    #     rating = max(800, rating)
+    #     rating = min(3500, rating)
         
         
-        userCommand=args[0]
+    #     userCommand=args[0]
         
-        if(userCommand=="letsgo"):
-            await ctx.send('letsgo command would get you the problems once coded!')
-        elif(userCommand=="completed"):
-            await ctx.send('completed command would get you your status once coded')
-        elif(userCommand=="streak"):
-            await ctx.send('streak command would get you the sreak once coded!')
-        elif(userCommand=="leaderboard"):
-            await ctx.send('leaderboard command would get you the leaderboard once coded!')
+    #     if(userCommand=="letsgo"):
+    #         await ctx.send('letsgo command would get you the problems once coded!')
+    #     elif(userCommand=="completed"):
+    #         await ctx.send('completed command would get you your status once coded')
+    #     elif(userCommand=="streak"):
+    #         await ctx.send('streak command would get you the sreak once coded!')
+    #     elif(userCommand=="leaderboard"):
+    #         await ctx.send('leaderboard command would get you the leaderboard once coded!')
 
 
 
