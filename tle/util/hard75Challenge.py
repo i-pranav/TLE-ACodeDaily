@@ -15,11 +15,15 @@ from tle.util import discord_common
 from tle.util.db.user_db_conn import Gitgud
 from tle.util import paginator
 from tle.util import cache_system2
+"""
+NOTE : please don't use this class... it's instantiation needs more effort for now coded is added inside the codeforces module. 
 
+"""
 class Hard75Challenge(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.converter = commands.MemberConverter()
+
     @commands.command(brief='Hard 75 challenge')
     @cf_common.user_guard(group='hard75')
     async def hard75(self,ctx,*args):
@@ -78,8 +82,6 @@ class Hard75Challenge(commands.Cog):
             await ctx.send('streak command would get you the sreak once coded!')
         elif(userCommand=="leaderboard"):
             await ctx.send('leaderboard command would get you the leaderboard once coded!')
-
-
 
 async def setup(bot):
     await bot.add_cog(Hard75Challenge(bot))
