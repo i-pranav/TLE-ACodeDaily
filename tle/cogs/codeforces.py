@@ -310,7 +310,9 @@ class Codeforces(commands.Cog):
         embed.add_field(name='Rating', value=problem.rating)
         embed.add_field(name='Alltime points', value=(1))
         # mention an embed which includes the streak day of the user! 
-        await ctx.send(f'Hard75 problem`{idx}` for `{handle}`[`{now.date}`]', embed=embed)
+        await ctx.send(f'Hard75 problem`{idx}` for `{handle}` [`{datetime.date.today()}`]', embed=embed)
+
+
     @commands.command(brief='Hard 75 challenge')
     @cf_common.user_guard(group='hard75')
     async def hard75(self,ctx,*args):
