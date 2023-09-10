@@ -76,10 +76,10 @@ class Codeforces(commands.Cog):
         today=datetime.datetime.utcnow().strftime('%Y-%m-%d')
         assigned_date,last_update=cf_common.user_db.get_Hard75Date(user_id)
         if(last_update==today):
-            ctx.send(f"Your progress has already been updated for `{today}`")
+            await ctx.send(f"Your progress has already been updated for `{today}`")
             return
         if(assigned_date!=today):
-            ctx.send(f"OOPS! you didn't solve the problems in the 24H window! you were required to solve it on `{assigned_date}`")
+            await ctx.send(f"OOPS! you didn't solve the problems in the 24H window! you were required to solve it on `{assigned_date}`")
         # else the user has completed his task on the given day hence let's update it
         
         current_streak, longest_streak=cf_common.user_db.get_Hard75UserStat(user_id)
@@ -94,8 +94,6 @@ class Codeforces(commands.Cog):
         if(current_streak==0):      # on first day!
             current_streak=1    
 
-        await ctx.send(f'val1: {current_streak} val2: {longest_streak}')
-        current_streak=10
         longest_streak=max(current_streak,longest_streak)
         rc=cf_common.user_db.updateStreak_Hard75Challenge(user_id,current_streak,longest_streak)
         if(rc!=1):
