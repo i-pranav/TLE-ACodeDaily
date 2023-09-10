@@ -369,7 +369,7 @@ class UserDbConn:
             SELECT assigned_date, last_updated from hard75_challenge
             WHERE user_id = ?
         '''
-        res=self.conn.execute(query1,(user_id)).fetchone()
+        res=self.conn.execute(query1,(str(user_id))).fetchone()
         return res[0],res[1]
     def get_Hard75UserStat(self,user_id):
         # the assumption is that record exists
@@ -377,7 +377,7 @@ class UserDbConn:
             SELECT current_streak,longest_streak from hard75_challenge
             WHERE user_id = ?
         '''
-        return self.conn.execute(query1,(user_id)).fetchone()
+        return self.conn.execute(query1,(str(user_id))).fetchone()
 
     def check_Hard75Challenge(self,user_id):
         query1 = '''
@@ -385,7 +385,7 @@ class UserDbConn:
             WHERE user_id = ? AND assigned_date = ?
         '''
         today=datetime.datetime.utcnow().strftime('%Y-%m-%d')
-        res = self.conn.execute(query1, (user_id,today)).fetchone()
+        res = self.conn.execute(query1, (str(user_id),today)).fetchone()
         if res is None: #need to start a new challenge! 
             return False
         return True
