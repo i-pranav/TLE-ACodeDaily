@@ -373,8 +373,8 @@ class UserDbConn:
         '''
         #the execution assumes that it has been validated that the presence of this row was confirmed! 
         today=datetime.date.today()
-        return self.conn.execute(query1, (user_id,today)).fetchone()
-        
+        res=self.conn.execute(query1, (user_id,today)).fetchone()
+        return res[0],res[1],res[2],res[3]
     def new_Hard75Challenge(self,user_id,handle,p1_id,c1_id,p2_id,c2_id):   
         #check for existing record, if exists-> change accordingly else add new row
         query1 = '''
