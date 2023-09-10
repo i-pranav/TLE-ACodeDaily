@@ -290,7 +290,27 @@ class Codeforces(commands.Cog):
         str_handles = '`, `'.join(handles)
         embed = discord_common.cf_color_embed(description=msg)
         await ctx.send(f'Mashup contest for `{str_handles}`', embed=embed)
+    
+    async def _hard75(self, ctx, handle, problem):
+        user_id = ctx.author.id
+        issue_time = datetime.datetime.now().timestamp()
+        # rc = cf_common.user_db.new_challenge(user_id, issue_time, problem, delta)
+        # if rc != 1:
+        #     raise CodeforcesCogError('Your challenge has already been added to the database!')
+        #save the data into a new DB that this problem has been added for this user!
 
+        # Calculate time range of given month (d=) or current month
+        now = datetime.datetime.now()
+        start_time, end_time = cf_common.get_start_and_end_of_day(now)
+        now_time = int(now.timestamp())
+
+        title = f'{problem.index}. {problem.name}'
+        desc = cf_common.cache2.contest_cache.get_contest(problem.contestId).name
+        embed = discord.Embed(title=title, url=problem.url, description=desc)
+        embed.add_field(name='Rating', value=problem.rating)
+        embed.add_field(name='Alltime points', value=(1))
+        # mention an embed which includes the streak day of the user! 
+        await ctx.send(f'Hard75 problem for `{handle}`', embed=embed)
     @commands.command(brief='Hard 75 challenge')
     @cf_common.user_guard(group='hard75')
     async def hard75(self,ctx,*args):
@@ -338,19 +358,39 @@ class Codeforces(commands.Cog):
             Use individual functions for each of the above mentioned functionality so as to keep it modular
         """
         await ctx.send("v2")
-        await ctx.send("v3")
         handle, = await cf_common.resolve_handles(ctx, self.converter, ('!' + str(ctx.author),))
         user = cf_common.user_db.fetch_cf_user(handle)
         rating = round(user.effective_rating, -2)
         rating = max(1100, rating)
         rating = min(3000, rating)
+        rating1 = rating            # this is the rating for the problem 1
+        rating2 = rating1+200       # this is the rating for the problem 2
         submissions = await cf.user.status(handle=handle)
         solved = {sub.problem.name for sub in submissions}
-
-        await ctx.send("V4")
+        
         userCommand=args[0]
         if(userCommand=="letsgo"):
-            await ctx.send('letsgo command would get you the problems once coded!')
+            problems1 = [prob for prob in cf_common.cache2.problem_cache.problems
+                        if (prob.rating == rating1 
+                        and prob.name not in solved)]
+            problems2 = [prob for prob in cf_common.cache2.problem_cache.problems
+                        if (prob.rating == rating1 
+                        and prob.name not in solved)]
+            
+            def check(problem):     # check that the user isn't the author and it's not a nonstanard problem    
+                return (not cf_common.is_nonstandard_problem(problem) and
+                        not cf_common.is_contest_writer(problem.contestId, handle))
+            problems1 = list(filter(check, problems1))
+            problems2 = list(filter(check,problems2))
+            if not problems1 or not problems2:
+                raise CodeforcesCogError('Great! You have finished all the problems')
+            problems1.sort(key=lambda problem: cf_common.cache2.contest_cache.get_contest(problem.contestId).startTimeSeconds)
+            problems2.sort(key=lambda problem: cf_common.cache2.contest_cache.get_contest(problem.contestId).startTimeSeconds)
+            choice1 = max(random.randrange(len(problems1)) for _ in range(5))
+            choice2 = max(random.randrange(len(problems2)) for _ in range(5))
+            await self._hard75(ctx, handle, problems1[choice1])
+            await self._hard75(ctx, handle, problems2[choice2])
+            
         elif(userCommand=="completed"):
             await ctx.send('completed command would get you your status once coded')
         elif(userCommand=="streak"):
