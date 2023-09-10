@@ -363,8 +363,8 @@ class UserDbConn:
         today=datetime.date.today()
         res = self.conn.execute(query1, (user_id,today)).fetchone()
         if res is None: #need to start a new challenge! 
-            return True
-        return False
+            return False
+        return True
     
     def get_Hard75Challenge(self,user_id):
         query1 = '''
@@ -375,6 +375,9 @@ class UserDbConn:
         today=datetime.date.today()
         res=self.conn.execute(query1, (user_id,today)).fetchone()
         return res[0],res[1],res[2],res[3]
+    
+
+
     def new_Hard75Challenge(self,user_id,handle,p1_id,c1_id,p2_id,c2_id):   
         #check for existing record, if exists-> change accordingly else add new row
         query1 = '''
