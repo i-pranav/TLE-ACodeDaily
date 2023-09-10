@@ -74,15 +74,13 @@ class Hard75Challenge(commands.Cog):
             Use individual functions for each of the above mentioned functionality so as to keep it modular
         """
         await ctx.send("v1")
-        handles, = handles or ('!' + str(ctx.author),)
-        handles = await cf_common.resolve_handles(ctx, self.converter, handles)
-        resp = [await cf.user.status(handle=handle) for handle in handles]
-        submissions = [sub for user in resp for sub in user]
+        handle, = await cf_common.resolve_handles(ctx, self.converter, ('!' + str(ctx.author),))
+        user = cf_common.user_db.fetch_cf_user(handle)
+        rating = round(user.effective_rating, -2)
+        rating = max(1100, rating)
+        rating = min(3000, rating)
+        submissions = await cf.user.status(handle=handle)
         solved = {sub.problem.name for sub in submissions}
-        info = await cf.user.info(handles=handles)
-        rating = int(round(sum(user.effective_rating for user in info) / len(handles), -2))
-        rating = max(800, rating)
-        rating = min(3500, rating)
 
 
         userCommand=args[0]
