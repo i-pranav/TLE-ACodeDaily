@@ -136,7 +136,7 @@ class Codeforces(commands.Cog):
         choice2 = max(random.randrange(len(problems2)) for _ in range(5))
         problem1=problems1[choice1]
         problem2=problems2[choice2]
-        res=cf_common.user_db.new_Hard75Challenge(user_id,handle,problem1.index,problem1.contestId,problem2.index,problem2.contestId)
+        res=cf_common.user_db.new_Hard75Challenge(user_id,handle,problem1.index,problem1.contestId,problem1.name,problem2.index,problem2.contestId,problem2.name)
         if res!=1:
             raise CodeforcesCogError("Issues while writing to db please contact ACD team!")
         await self._hard75(ctx, handle, problem1,1)
