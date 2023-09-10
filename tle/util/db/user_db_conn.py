@@ -1,7 +1,8 @@
 import sqlite3
 from enum import IntEnum
 from collections import namedtuple
-
+from typing import Any
+import datetime
 from discord.ext import commands
 
 from tle.util import codeforces_api as cf
@@ -62,7 +63,7 @@ class DatabaseDisabledError(UserDbError):
 
 class DummyUserDbConn:
     def __getattribute__(self, item):
-        raise DatabaseDisabledError
+            raise DatabaseDisabledError    
 
 
 class UniqueConstraintFailed(UserDbError):
@@ -92,6 +93,7 @@ class UserDbConn:
             'PRIMARY KEY (user_id, guild_id)'
             ')'
         )
+
         self.conn.execute('CREATE UNIQUE INDEX IF NOT EXISTS ix_user_handle_guild_handle '
                           'ON user_handle (guild_id, handle)')
         self.conn.execute(
@@ -118,6 +120,28 @@ class UserDbConn:
                 "rating"	INTEGER NOT NULL,
                 "guild_id"  TEXT
             )
+        ''')
+        # used this to change the schema, commenting for future use (hope that it's never required though)
+        # self.conn.execute('''
+        #     DROP TABLE hard75_challenge
+        # ''')
+        self.conn.execute('''
+            CREATE TABLE IF NOT EXISTS hard75_challenge(
+            "user_id"                TEXT,
+            "handle"                 TEXT,
+            "current_streak"         INTEGER,
+            "longest_streak"         INTEGER,
+            "c1_id"                  INTEGER,
+            "p1_id"                  INTEGER,
+            "p1_name"                TEXT,
+            "c2_id"                  INTEGER,
+            "p2_id"                  INTEGER,
+            "p2_name"                TEXT,
+            "p1_solved"              BOOL,
+            "p2_solved"              BOOL,
+            "assigned_date"          TEXT,   
+            "last_updated"           TEXT
+            )      
         ''')
         self.conn.execute('''
             CREATE TABLE IF NOT EXISTS duel(
@@ -336,6 +360,132 @@ class UserDbConn:
         res = self.conn.execute(query, params).fetchall()
         self.conn.row_factory = None
         return res
+    
+
+    def get_Hard75Date(self,user_id):
+        # the assumption is that record exists
+        # returns the assigned_date and the last_updated date. 
+        query1 ='''
+            SELECT assigned_date, last_updated FROM hard75_challenge
+            WHERE user_id = ?
+        '''
+        res=self.conn.execute(query1,(user_id,)).fetchone()
+        return res[0],res[1]
+    
+    def get_Hard75UserStat(self,user_id):
+        # the assumption is that record exists
+        query1 ='''
+            SELECT current_streak, longest_streak FROM hard75_challenge
+            WHERE user_id = ?
+        '''
+        return self.conn.execute(query1,(user_id,)).fetchone()
+
+
+    
+    def check_Hard75Challenge(self,user_id):
+        query1 = '''
+            SELECT * FROM hard75_challenge
+            WHERE user_id = ? AND assigned_date = ?
+        '''
+        today=datetime.datetime.utcnow().strftime('%Y-%m-%d')
+        res = self.conn.execute(query1, (user_id,today)).fetchone()
+        if res is None: #need to start a new challenge! 
+            return False
+        return True
+    
+    def updateStreak_Hard75Challenge(self,user_id,current_streak,longest_streak):
+        cur = self.conn.cursor()
+        today=datetime.datetime.utcnow().strftime('%Y-%m-%d')
+        query1='''
+            UPDATE hard75_challenge SET current_streak = ?, longest_streak = ?, last_updated = ?
+            WHERE user_id = ?
+        '''
+        cur.execute(query1,(current_streak,longest_streak,today,user_id))
+        #last updated is set to 0 because it's logic wouldn't interfere this way 
+        #the entire point of using last updated is that a user shouln't be able to get multiple points for the same day. 
+        if cur.rowcount!=1:
+            self.conn.rollback()
+            return 0
+        self.conn.commit()
+        return 1
+    def get_Hard75Challenge(self,user_id):
+        query1 = '''
+            SELECT c1_id, p1_id, p1_name, c2_id, p2_id, p2_name FROM hard75_challenge
+            WHERE user_id = ? AND assigned_date = ?
+        '''
+        #the execution assumes that it has been validated that the presence of this row was confirmed! 
+        today=datetime.datetime.utcnow().strftime('%Y-%m-%d')
+        return self.conn.execute(query1, (user_id,today)).fetchone()
+    
+
+
+    def new_Hard75Challenge(self,user_id,handle,p1_id,c1_id,p1_name,p2_id,c2_id,p2_name):   
+        #check for existing record, if exists-> change accordingly else add new row
+        query1 = '''
+            SELECT current_streak,longest_streak FROM hard75_challenge
+            WHERE user_id = ? AND assigned_date = ?
+        '''
+        today=datetime.datetime.utcnow().strftime('%Y-%m-%d')
+
+        cur = self.conn.cursor()
+        res=self.conn.execute(query1,(user_id,today)).fetchone()
+        
+        if res is not None:
+            query2='''
+            UPDATE hard75_challenge SET p1_id = ?, c1_id = ?, p1_name = ?, p2_id = ?, c2_id = ?, p2_name = ?, assigned_date = ?, p1_solved = ?, p2_solved = ?
+            WHERE user_id = ?
+            '''
+            cur.execute(query2,(p1_id,c1_id,p1_name,p2_id,c2_id,p2_name,today,0,0,user_id))
+            #the entire point of using last updated is that a user shouln't be able to get multiple points for the same day. 
+            if cur.rowcount!=1:
+                self.conn.rollback()
+                return 0
+            self.conn.commit()
+            return 1
+        #cleanup the schema post work. added for reference.
+            # 'user_id                TEXT',
+            # 'handle                 TEXT',
+            # 'current_streak         INTEGER',
+            # 'longest_streak         INTEGER',
+            # 'c1_id                  INTEGER',
+            # 'p1_id                  INTEGER',
+            # 'c2_id                  INTEGER',
+            # 'p2_id                  INTEGER',
+            # 'p1_solved              BOOL',
+            # 'p2_solved              BOOL',
+            # 'assigned_date          TEXT',   
+            # 'last_updated           TEXT',
+            # 'PRIMARY KEY (user_id)'      
+        query3='''
+            INSERT INTO hard75_challenge
+            (user_id, handle, current_streak, longest_streak, c1_id, p1_id, p1_name, c2_id, p2_id, p2_name, p1_solved, p2_solved, assigned_date, last_updated)
+            VALUES
+            (?, ?, ?, ?, ?, ?, ?, ?, ? ,?, ?, ?, ?, ?)
+        '''
+        cur.execute(query3,(user_id,handle,0,0,c1_id,p1_id,p1_name,c2_id,p2_id,p2_name,0,0,today,0))
+        if cur.rowcount!=1:
+            self.conn.rollback()
+            return 0
+        self.conn.commit()
+        return 1
+    
+    def get_hard75_status(self,user_id):
+        query1 = '''
+            SELECT current_streak,longest_streak,last_updated FROM hard75_challenge
+            WHERE user_id = ?
+        '''
+        return self.conn.execute(query1,(user_id,)).fetchone()
+        
+    def get_hard75_LeaderBoard(self):
+        query1 = '''
+            SELECT user_id, longest_streak FROM hard75_challenge
+            ORDER BY longest_streak DESC
+            LIMIT 5
+        '''
+        return self.conn.execute(query1).fetchone()
+        
+        
+
 
     def new_challenge(self, user_id, issue_time, prob, delta):
         query1 = '''
