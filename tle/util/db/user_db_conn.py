@@ -366,18 +366,18 @@ class UserDbConn:
         # the assumption is that record exists
         # returns the assigned_date and the last_updated date. 
         query1 ='''
-            SELECT assigned_date, last_updated from hard75_challenge
+            SELECT assigned_date, last_updated FROM hard75_challenge
             WHERE user_id = ?
         '''
-        res=self.conn.execute(query1,(str(user_id))).fetchone()
+        res=self.conn.execute(query1,user_id).fetchone()
         return res[0],res[1]
     def get_Hard75UserStat(self,user_id):
         # the assumption is that record exists
         query1 ='''
-            SELECT current_streak,longest_streak from hard75_challenge
+            SELECT current_streak,longest_streak FROM hard75_challenge
             WHERE user_id = ?
         '''
-        return self.conn.execute(query1,(str(user_id))).fetchone()
+        return self.conn.execute(query1,(user_id)).fetchone()
 
     def check_Hard75Challenge(self,user_id):
         query1 = '''
