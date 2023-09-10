@@ -134,7 +134,7 @@ class Codeforces(commands.Cog):
                 pass
             names.append(f"<@!{r}>")
         rankArr=[0]*len(names)
-        for i in range(0,5):
+        for i in range(0,len(names)):
             rankArr[i]=i+1
                 
         embed=discord.Embed(
