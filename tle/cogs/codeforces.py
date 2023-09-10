@@ -385,7 +385,7 @@ class Codeforces(commands.Cog):
             problems1 = list(filter(check, problems1))
             problems2 = list(filter(check,problems2))
             if not problems1 or not problems2:
-                raise CodeforcesCogError('Great! You have finished all the problems')
+                raise CodeforcesCogError('Great! You have finished all the problems, do atcoder now lol!')
             problems1.sort(key=lambda problem: cf_common.cache2.contest_cache.get_contest(problem.contestId).startTimeSeconds)
             problems2.sort(key=lambda problem: cf_common.cache2.contest_cache.get_contest(problem.contestId).startTimeSeconds)
             choice1 = max(random.randrange(len(problems1)) for _ in range(5))
@@ -394,10 +394,15 @@ class Codeforces(commands.Cog):
             await self._hard75(ctx, handle, problems2[choice2],2)
             
         elif(userCommand=="completed"):
+            # the logic would require implementing the database first!
             await ctx.send('completed command would get you your status once coded')
+
         elif(userCommand=="streak"):
+            # the logic would require implementing the database first!
             await ctx.send('streak command would get you the sreak once coded!')
+
         elif(userCommand=="leaderboard"):
+            # the logic would require implementing the database first!
             await ctx.send('leaderboard command would get you the leaderboard once coded!')
 
 
