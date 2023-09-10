@@ -291,7 +291,7 @@ class Codeforces(commands.Cog):
         embed = discord_common.cf_color_embed(description=msg)
         await ctx.send(f'Mashup contest for `{str_handles}`', embed=embed)
     
-    async def _hard75(self, ctx, handle, problem):
+    async def _hard75(self, ctx, handle, problem,idx):
         user_id = ctx.author.id
         issue_time = datetime.datetime.now().timestamp()
         # rc = cf_common.user_db.new_challenge(user_id, issue_time, problem, delta)
@@ -310,7 +310,7 @@ class Codeforces(commands.Cog):
         embed.add_field(name='Rating', value=problem.rating)
         embed.add_field(name='Alltime points', value=(1))
         # mention an embed which includes the streak day of the user! 
-        await ctx.send(f'Hard75 problem for `{handle}`', embed=embed)
+        await ctx.send(f'Hard75 problem`{idx}` for `{handle}`[`{now.date}`]', embed=embed)
     @commands.command(brief='Hard 75 challenge')
     @cf_common.user_guard(group='hard75')
     async def hard75(self,ctx,*args):
@@ -374,7 +374,7 @@ class Codeforces(commands.Cog):
                         if (prob.rating == rating1 
                         and prob.name not in solved)]
             problems2 = [prob for prob in cf_common.cache2.problem_cache.problems
-                        if (prob.rating == rating1 
+                        if (prob.rating == rating2 
                         and prob.name not in solved)]
             
             def check(problem):     # check that the user isn't the author and it's not a nonstanard problem    
@@ -388,8 +388,8 @@ class Codeforces(commands.Cog):
             problems2.sort(key=lambda problem: cf_common.cache2.contest_cache.get_contest(problem.contestId).startTimeSeconds)
             choice1 = max(random.randrange(len(problems1)) for _ in range(5))
             choice2 = max(random.randrange(len(problems2)) for _ in range(5))
-            await self._hard75(ctx, handle, problems1[choice1])
-            await self._hard75(ctx, handle, problems2[choice2])
+            await self._hard75(ctx, handle, problems1[choice1],1)
+            await self._hard75(ctx, handle, problems2[choice2],2)
             
         elif(userCommand=="completed"):
             await ctx.send('completed command would get you your status once coded')
