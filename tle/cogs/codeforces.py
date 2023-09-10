@@ -322,9 +322,6 @@ class Codeforces(commands.Cog):
 
             Hard75 DB schema
             identifier(user)  problem1 , problem2, Streak, lastSolveDate, longesStreak
-               
-
-            
         TBD/future scope:
             1. cron job to automatically mark completed challengs
             2. add a certificate for people who complete their 75 days challenge
@@ -340,7 +337,8 @@ class Codeforces(commands.Cog):
         """
             Use individual functions for each of the above mentioned functionality so as to keep it modular
         """
-        # await ctx.send("v2")
+        await ctx.send("v2")
+        await ctx.send("v3")
         handle, = await cf_common.resolve_handles(ctx, self.converter, ('!' + str(ctx.author),))
         user = cf_common.user_db.fetch_cf_user(handle)
         rating = round(user.effective_rating, -2)
@@ -349,7 +347,7 @@ class Codeforces(commands.Cog):
         submissions = await cf.user.status(handle=handle)
         solved = {sub.problem.name for sub in submissions}
 
-
+        await ctx.send("V4")
         userCommand=args[0]
         if(userCommand=="letsgo"):
             await ctx.send('letsgo command would get you the problems once coded!')
