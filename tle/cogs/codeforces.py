@@ -88,8 +88,13 @@ class Codeforces(commands.Cog):
         yesterday=yesterday.strftime('%Y-%m-%d')
 
         #check if streak continues!
+        
         if(last_update==yesterday):
             current_streak+=1
+
+        if(current_streak==0):      # on first day!
+            current_streak=1    
+        current_streak=10
         longest_streak=max(current_streak,longest_streak)
         rc=cf_common.user_db.updateStreak_Hard75Challenge(user_id,current_streak,longest_streak)
         if(rc!=1):
@@ -99,7 +104,7 @@ class Codeforces(commands.Cog):
         embed.add_field(name='longest streak', value=(longest_streak))
         
         # mention an embed which includes the streak day of the user! 
-        await ctx.send(f'Hi `{handle}` !You have completed your daily challenge for {today} ', embed=embed)
+        await ctx.send(f'Hi `{handle}`! You have completed your daily challenge for {today} ', embed=embed)
 
     
     async def _hard75_Retried(self, ctx, handle,contest_id1,idx1,contest_id2,idx2):
