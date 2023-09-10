@@ -5,6 +5,7 @@ import math
 import time
 from collections import defaultdict
 
+
 import discord
 from discord.ext import commands
 
@@ -67,9 +68,9 @@ class Codeforces(commands.Cog):
         if not p1_name in solved and not p2_name in solved:
             raise CodeforcesCogError('You haven\'t completed either of the problems!.')
         if not p1_name in solved:
-            raise CodeforcesCogError('You haven\'t completed the problem1!! .')
+            raise CodeforcesCogError('You haven\'t completed the problem1!!.')
         if not p2_name in solved:
-            raise CodeforcesCogError('You haven\'t completed the problem2!! .')
+            raise CodeforcesCogError('You haven\'t completed the problem2!!.')
         # else I need to update accordingly... 
         today=datetime.datetime.utcnow().strftime('%Y-%m-%d')
         assigned_date,last_update=cf_common.user_db.get_Hard75Date(user_id);
@@ -79,13 +80,26 @@ class Codeforces(commands.Cog):
         if(assigned_date!=today):
             ctx.send(f"OOPS! you didn't solve the problems in the 24H window! you were required to solve it on `{assigned_date}`")
         # else the user has completed his task on the given day hence let's update it
+        
         current_streak, longest_streak=cf_common.user_db.get_Hard75UserStat(user_id)
-        await ctx.send('Congrats!')
-        # if rc == 1:
-        #     duration = cf_common.pretty_time_format(finish_time - issue_time)
-        #     await ctx.send(f'Challenge completed in {duration}. {handle} gained {score} alltime ranklist points and {monthlyPoints} monthly ranklist points.')
-        # else:
-        #     await ctx.send('You have already claimed your points')
+
+        yesterday=datetime.datetime.utcnow()-datetime.timedelta(days=1)
+        yesterday=yesterday.strftime('%Y-%m-%d')
+
+        #check if streak continues!
+        if(last_update==yesterday):
+            current_streak+=1
+        longest_streak=max(current_streak,longest_streak)
+        rc=cf_common.user_db.updateStreak_Hard75Challenge(user_id,current_streak,longest_streak)
+        if(rc!=1):
+            raise CodeforcesCogError('Some issue while monitoring progress! Please contact the ACD Team!.')
+        embed = discord.Embed(description="Congratulations!!")
+        embed.add_field(name='current streak', value=(current_streak))
+        embed.add_field(name='longest streak', value=(longest_streak))
+        
+        # mention an embed which includes the streak day of the user! 
+        await ctx.send(f'Hi `{handle}` !You have completed your daily challenge for {today} ', embed=embed)
+
     
     async def _hard75_Retried(self, ctx, handle,contest_id1,idx1,contest_id2,idx2):
         user_id = ctx.author.id

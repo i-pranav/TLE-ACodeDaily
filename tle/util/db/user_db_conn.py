@@ -389,7 +389,21 @@ class UserDbConn:
         if res is None: #need to start a new challenge! 
             return False
         return True
-    
+    def updateStreak_Hard75Challenge(self,user_id,current_streak,longest_streak):
+        cur = self.conn.cursor()
+        res=self.conn.execute(query1,(user_id,today)).fetchone()
+        query1='''
+        UPDATE hard75_challenge SET current_streak = ?,longest_streak = ?
+        WHERE user_id = ?
+        '''
+        cur.execute(query1,(current_streak,longest_streak,user_id))
+        #last updated is set to 0 because it's logic wouldn't interfere this way 
+        #the entire point of using last updated is that a user shouln't be able to get multiple points for the same day. 
+        if cur.rowcount!=1:
+            self.conn.rollback()
+            return 0
+        self.conn.commit()
+        return 1
     def get_Hard75Challenge(self,user_id):
         query1 = '''
             SELECT c1_id, p1_id, p1_name, c2_id, p2_id,p2_name FROM hard75_challenge
@@ -417,8 +431,7 @@ class UserDbConn:
             UPDATE hard75_challenge SET p1_id = ?, c1_id = ?, p1_name = ?, p2_id = ?, c2_id = ?, p2_name = ?, assigned_date = ?, p1_solved = ?, p2_solved = ?
             WHERE user_id = ?
             '''
-            cur.execute(query2,(p1_id,c1_id,p1_name,p2_id,c2_id,p2_name,today,0,0))
-            #last updated is set to 0 because it's logic wouldn't interfere this way 
+            cur.execute(query2,(p1_id,c1_id,p1_name,p2_id,c2_id,p2_name,today,0,0,user_id))
             #the entire point of using last updated is that a user shouln't be able to get multiple points for the same day. 
             if cur.rowcount!=1:
                 self.conn.rollback()
