@@ -142,8 +142,8 @@ class Codeforces(commands.Cog):
             title="Leaderboard",
             color=discord.Color.blue()
         )
-        embed.add_field(name='Name',value=nameslist,inline=True)
         embed.add_field(name='Rank',value=ranklist,inline=True)
+        embed.add_field(name='Name',value=nameslist,inline=True)
         await ctx.send(embed=embed)
 
     async def _Hard75_streak(self,ctx):
