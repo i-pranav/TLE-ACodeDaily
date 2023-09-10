@@ -120,6 +120,9 @@ class Codeforces(commands.Cog):
         
         # mention an embed which includes the streak day of the user! 
         await ctx.send(f'You have already been assigned the problems for [`{datetime.datetime.utcnow().strftime("%Y-%m-%d")}`] `{handle}` ', embed=embed)
+    
+    
+    
     async def _Hard75_Leaderboard(self,ctx):
         await ctx.send(f'Will do the beutification later on!')
         embed = discord.Embed(title="Your Hard75 grind!",description="This is what you achieved!")
@@ -128,7 +131,8 @@ class Codeforces(commands.Cog):
             raise CodeforcesCogError('No One has completed anything as of now - leaderboard is empty!')
         rank=1
         for r in res:
-            embed.add_field(name=f'Rank {rank}',value=r)
+            embed.add_field(name=f'Rank {rank}',value=f"<@!{r}>")
+            rank+=1 
         await ctx.send(f'The Hard75 leaderboard!', embed=embed)
 
     async def _Hard75_streak(self,ctx):
