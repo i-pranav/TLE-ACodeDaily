@@ -124,14 +124,13 @@ class Codeforces(commands.Cog):
     
     
     async def _Hard75_Leaderboard(self,ctx):
-        await ctx.send(f'Will do the beutification later on!')
         embed = discord.Embed(title="Your Hard75 grind!",description="This is what you achieved!")
         res=cf_common.user_db.get_hard75_LeaderBoard()
         if res is None: 
             raise CodeforcesCogError('No One has completed anything as of now - leaderboard is empty!')
         names=[]
         for r in res:
-            if(len(r)<5):
+            if(r<1000):
                 pass
             names.append(f"<@!{r}>")
         rankArr=[0]*len(names)
