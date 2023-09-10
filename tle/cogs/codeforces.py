@@ -291,7 +291,7 @@ class Codeforces(commands.Cog):
         embed = discord_common.cf_color_embed(description=msg)
         await ctx.send(f'Mashup contest for `{str_handles}`', embed=embed)
 
-        @commands.command(brief='Hard 75 challenge')
+    @commands.command(brief='Hard 75 challenge')
     @cf_common.user_guard(group='hard75')
     async def hard75(self,ctx,*args):
         """
