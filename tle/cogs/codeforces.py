@@ -61,7 +61,7 @@ class Codeforces(commands.Cog):
         
         submissions = await cf.user.status(handle=handle)
         solved = {sub.problem.name for sub in submissions if sub.verdict == 'OK'}
-        c1_id,p1_id,c2_id,p2_id=cf_common.user_db.get_Hard75Challenge(user_id)
+        c1_id,p1_id,p1_name,c2_id,p2_id,p2_name=cf_common.user_db.get_Hard75Challenge(user_id)
         challenge_id, issue_time, name, contestId, index, delta = active
         if not name in solved:
             raise CodeforcesCogError('You haven\'t completed the challenge.')
@@ -105,7 +105,7 @@ class Codeforces(commands.Cog):
         user_id = ctx.author.id
         activeChallenge= cf_common.user_db.check_Hard75Challenge(user_id)
         if activeChallenge:     # problems are already there simply return from the DB 
-            c1_id,p1_id,c2_id,p2_id=cf_common.user_db.get_Hard75Challenge(user_id)
+            c1_id,p1_id,p1_name,c2_id,p2_id,p2_name=cf_common.user_db.get_Hard75Challenge(user_id)
             await self._hard75_Retried(ctx,handle,c1_id,p1_id,c2_id,p2_id)
             return
         rating = round(user.effective_rating, -2)
