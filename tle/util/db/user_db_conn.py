@@ -122,9 +122,9 @@ class UserDbConn:
             )
         ''')
         # used this to change the schema, commenting for future use (hope that it's never required though)
-        self.conn.execute('''
-            DROP TABLE hard75_challenge
-        ''')
+        # self.conn.execute('''
+        #     DROP TABLE hard75_challenge
+        # ''')
         self.conn.execute('''
             CREATE TABLE IF NOT EXISTS hard75_challenge(
             "user_id"                TEXT,
