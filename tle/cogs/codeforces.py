@@ -133,7 +133,7 @@ class Codeforces(commands.Cog):
         for r in res:
             if(len(r)<5):
                 pass
-            names.push(f"<@!{r}>")
+            names.append(f"<@!{r}>")
         rankArr=[0]*len(names)
         for i in range(0,5):
             rankArr[i]=i+1
