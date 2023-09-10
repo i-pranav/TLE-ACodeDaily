@@ -73,8 +73,8 @@ class Hard75Challenge(commands.Cog):
         """
             Use individual functions for each of the above mentioned functionality so as to keep it modular
         """
-
-        handles = handles or ('!' + str(ctx.author),)
+        await ctx.send("v1")
+        handles, = handles or ('!' + str(ctx.author),)
         handles = await cf_common.resolve_handles(ctx, self.converter, handles)
         resp = [await cf.user.status(handle=handle) for handle in handles]
         submissions = [sub for user in resp for sub in user]
