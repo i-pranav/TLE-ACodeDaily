@@ -120,6 +120,27 @@ class Codeforces(commands.Cog):
         
         # mention an embed which includes the streak day of the user! 
         await ctx.send(f'You have already been assigned the problems for [`{datetime.datetime.utcnow().strftime("%Y-%m-%d")}`] `{handle}` ', embed=embed)
+    async def _Hard75_Leaderboard(self,ctx):
+        await ctx.send(f'Will do the beutification later on!')
+        embed = discord.Embed(title="Your Hard75 grind!",description="This is what you achieved!")
+        res=cf_common.user_db.get_hard75_LeaderBoard()
+        rank=1
+        for r in res:
+            embed.add_field(name=f'Rank {rank}',value=r)
+        await ctx.send(f'The Hard75 leaderboard!', embed=embed)
+
+    async def _Hard75_streak(self,ctx):
+        user_id=ctx.author.id
+        res=cf_common.user_db.get_hard75_status(user_id)
+        if res is None:
+            raise CodeforcesCogError('There is no record of yours in the DB have you ever completed a Hard75 problem?')
+        current_streak,longest_streak,last_updated=res
+        
+        embed = discord.Embed(title="Your Hard75 grind!",description="This is what you achieved!")
+        embed.add_field(name='current streak', value=current_streak)
+        embed.add_field(name='longest streak', value=longest_streak)
+        embed.add_field(name='last problem solved on', value=last_updated)
+        await ctx.send(f'Thanks for participating in the challenge!', embed=embed)
 
 
     async def _Hard75_letsgo(self,ctx,handle,user):
@@ -177,8 +198,6 @@ class Codeforces(commands.Cog):
         desc = cf_common.cache2.contest_cache.get_contest(problem.contestId).name
         embed = discord.Embed(title=title, url=problem.url, description=desc)
         embed.add_field(name='Rating', value=problem.rating)
-        # embed.add_field(name='Alltime points', value=(1))
-        # mention an embed which includes the streak day of the user! 
         await ctx.send(f'Hard75 problem`#{idx}` for `{handle}` [`{datetime.datetime.utcnow().strftime("%Y-%m-%d")}`]', embed=embed)
 
 
@@ -238,12 +257,14 @@ class Codeforces(commands.Cog):
             await self._hard75_completed(ctx)
 
         elif(userCommand=="streak"):
+            await self._Hard75_streak(ctx)
             # the logic would require implementing the database first!
-            await ctx.send('streak command would get you the sreak once coded!')
+            # await ctx.send('streak command would get you the sreak once coded!')
 
         elif(userCommand=="leaderboard"):
+            await self._Hard75_Leaderboard(ctx)
             # the logic would require implementing the database first!
-            await ctx.send('leaderboard command would get you the leaderboard once coded!')
+            # await ctx.send('leaderboard command would get you the leaderboard once coded!')
 
 
     async def _validate_gitgud_status(self, ctx, delta):
