@@ -52,6 +52,65 @@ class Codeforces(commands.Cog):
             morePointsActive = True
         return morePointsActive
 
+
+    
+    async def _hard75_Retried(self, ctx, handle,contest_id1,idx1,contest_id2,idx2):
+        user_id = ctx.author.id
+        issue_time = datetime.datetime.now().timestamp()
+        now = datetime.datetime.now()
+        start_time, end_time = cf_common.get_start_and_end_of_day(now)
+        now_time = int(now.timestamp())
+
+        url1 = f'{cf.CONTEST_BASE_URL}{contest_id1}/problem/{idx1}'
+        url2 = f'{cf.CONTEST_BASE_URL}{contest_id2}/problem/{idx2}'
+        embed = discord.Embed(description="Get your daily task done!")
+        embed.add_field(name='Problem 1', value=(url1))
+        embed.add_field(name='Problem 2', value=(url2))
+        
+        # mention an embed which includes the streak day of the user! 
+        await ctx.send(f'You have already been assigned the problems for [`{datetime.date.today()}`] `{handle}` ', embed=embed)
+
+
+    async def _Hard75_letsgo(self,ctx,handle,user):
+        user_id = ctx.author.id
+        activeChallenge= cf_common.user_db.check_Hard75Challenge(user_id)
+        if activeChallenge:     # problems are already there simply return from the DB 
+            c1_id,p1_id,c2_id,p2_id=cf_common.user_db.get_Hard75Challenge(user_id)
+            self._hard75_Retried(ctx,handle,c1_id,p1_id,c2_id,p2_id)
+            return
+        rating = round(user.effective_rating, -2)
+        rating = max(800, rating)
+        rating = min(3000, rating)
+        rating1 = rating            # this is the rating for the problem 1
+        rating2 = rating1+200       # this is the rating for the problem 2
+        submissions = await cf.user.status(handle=handle)
+        solved = {sub.problem.name for sub in submissions}
+        problems1 = [prob for prob in cf_common.cache2.problem_cache.problems
+                    if (prob.rating == rating1 
+                    and prob.name not in solved)]
+        problems2 = [prob for prob in cf_common.cache2.problem_cache.problems
+                    if (prob.rating == rating2 
+                    and prob.name not in solved)]
+
+        def check(problem):     # check that the user isn't the author and it's not a nonstanard problem    
+            return (not cf_common.is_nonstandard_problem(problem) and
+                    not cf_common.is_contest_writer(problem.contestId, handle))
+        problems1 = list(filter(check, problems1))
+        problems2 = list(filter(check,problems2))
+        if not problems1 or not problems2:
+            raise CodeforcesCogError('Great! You have finished all the problems, do atcoder now lol!')
+        
+        problems1.sort(key=lambda problem: cf_common.cache2.contest_cache.get_contest(problem.contestId).startTimeSeconds)
+        problems2.sort(key=lambda problem: cf_common.cache2.contest_cache.get_contest(problem.contestId).startTimeSeconds)
+        choice1 = max(random.randrange(len(problems1)) for _ in range(5))
+        choice2 = max(random.randrange(len(problems2)) for _ in range(5))
+        res=cf_common.user_db.new_Hard75Challenge(user_id,handle,p1_id,c1_id,p2_id,c2_id)
+        if res!=1:
+            raise CodeforcesCogError("Issues while writing to db please contact ACD team!")
+        await self._hard75(ctx, handle, problems1[choice1],1)
+        await self._hard75(ctx, handle, problems2[choice2],2)
+
+
     async def _validate_gitgud_status(self, ctx, delta):
         if delta is not None and delta % 100 != 0:
             raise CodeforcesCogError('Delta must be a multiple of 100.')
@@ -294,12 +353,7 @@ class Codeforces(commands.Cog):
     async def _hard75(self, ctx, handle, problem,idx):
         user_id = ctx.author.id
         issue_time = datetime.datetime.now().timestamp()
-        # rc = cf_common.user_db.new_challenge(user_id, issue_time, problem, delta)
-        # if rc != 1:
-        #     raise CodeforcesCogError('Your challenge has already been added to the database!')
-        #save the data into a new DB that this problem has been added for this user!
-
-        # Calculate time range of given month (d=) or current month
+        #the below code updates it in the DB
         now = datetime.datetime.now()
         start_time, end_time = cf_common.get_start_and_end_of_day(now)
         now_time = int(now.timestamp())
@@ -310,7 +364,7 @@ class Codeforces(commands.Cog):
         embed.add_field(name='Rating', value=problem.rating)
         embed.add_field(name='Alltime points', value=(1))
         # mention an embed which includes the streak day of the user! 
-        await ctx.send(f'Hard75 problem`{idx}` for `{handle}` [`{datetime.date.today()}`]', embed=embed)
+        await ctx.send(f'Hard75 problem`#{idx}` for `{handle}` [`{datetime.date.today()}`]', embed=embed)
 
 
     @commands.command(brief='Hard 75 challenge')
@@ -359,39 +413,11 @@ class Codeforces(commands.Cog):
         """
             Use individual functions for each of the above mentioned functionality so as to keep it modular
         """
-        await ctx.send("v2")
         handle, = await cf_common.resolve_handles(ctx, self.converter, ('!' + str(ctx.author),))
         user = cf_common.user_db.fetch_cf_user(handle)
-        rating = round(user.effective_rating, -2)
-        rating = max(800, rating)
-        rating = min(3000, rating)
-        rating1 = rating            # this is the rating for the problem 1
-        rating2 = rating1+200       # this is the rating for the problem 2
-        submissions = await cf.user.status(handle=handle)
-        solved = {sub.problem.name for sub in submissions}
-        
         userCommand=args[0]
         if(userCommand=="letsgo"):
-            problems1 = [prob for prob in cf_common.cache2.problem_cache.problems
-                        if (prob.rating == rating1 
-                        and prob.name not in solved)]
-            problems2 = [prob for prob in cf_common.cache2.problem_cache.problems
-                        if (prob.rating == rating2 
-                        and prob.name not in solved)]
-            
-            def check(problem):     # check that the user isn't the author and it's not a nonstanard problem    
-                return (not cf_common.is_nonstandard_problem(problem) and
-                        not cf_common.is_contest_writer(problem.contestId, handle))
-            problems1 = list(filter(check, problems1))
-            problems2 = list(filter(check,problems2))
-            if not problems1 or not problems2:
-                raise CodeforcesCogError('Great! You have finished all the problems, do atcoder now lol!')
-            problems1.sort(key=lambda problem: cf_common.cache2.contest_cache.get_contest(problem.contestId).startTimeSeconds)
-            problems2.sort(key=lambda problem: cf_common.cache2.contest_cache.get_contest(problem.contestId).startTimeSeconds)
-            choice1 = max(random.randrange(len(problems1)) for _ in range(5))
-            choice2 = max(random.randrange(len(problems2)) for _ in range(5))
-            await self._hard75(ctx, handle, problems1[choice1],1)
-            await self._hard75(ctx, handle, problems2[choice2],2)
+            await self._Hard75_letsgo(ctx,handle,user)
             
         elif(userCommand=="completed"):
             # the logic would require implementing the database first!
