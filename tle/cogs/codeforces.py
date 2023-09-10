@@ -138,11 +138,11 @@ class Codeforces(commands.Cog):
             rankArr[i]=i+1
                 
         embed=discord.Embed(
-        title="Leaderboard",
-        color=discord.Color.blue()
+            title="Leaderboard",
+            color=discord.Color.blue()
         )
-        embed.add_field(name='Name',value=names,inline="true")
-        embed.add_field(name='Rank',value=rankArr,inline="true")
+        embed.add_field(name='Name',value=...names,inline=True)
+        embed.add_field(name='Rank',value=...rankArr,inline=True)
         await ctx.send(embed=embed)
 
     async def _Hard75_streak(self,ctx):
