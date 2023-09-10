@@ -371,6 +371,7 @@ class UserDbConn:
         '''
         res=self.conn.execute(query1,(user_id,)).fetchone()
         return res[0],res[1]
+    
     def get_Hard75UserStat(self,user_id):
         # the assumption is that record exists
         query1 ='''
@@ -379,6 +380,8 @@ class UserDbConn:
         '''
         return self.conn.execute(query1,(user_id,)).fetchone()
 
+
+    
     def check_Hard75Challenge(self,user_id):
         query1 = '''
             SELECT * FROM hard75_challenge
@@ -465,15 +468,22 @@ class UserDbConn:
         self.conn.commit()
         return 1
     
-    def get_hard75_status(self,userid):
-        pass
-        #this returns 0,0,0 incase the user doesn't exist else returns 
-        #current_streak, max_streak and last_updated!
-    
-    def get_hard75_LeaderBoard(self):
-        pass
-        #this returns the leaderboard.. basically pairs of the top userids with their max streak
-
+    def get_hard75_status(self,user_id):
+        query1 = '''
+            SELECT current_streak,longest_streak,last_updated FROM hard75_challenge
+            WHERE user_id = ?
+        '''
+        return self.conn.execute(query1,(user_id,)).fetchone()
+        
+    def get_hard75_LeaderBoard(self,user_id):
+        query1 = '''
+            SELECT user_id, longest_streak FROM hard75_challenge
+            ORDER BY longest_streak DESC
+            LIMIT 5
+        '''
+        return self.conn.execute(query1,(user_id,)).fetchone()
+        
+        
 
 
     def new_challenge(self, user_id, issue_time, prob, delta):

@@ -124,6 +124,8 @@ class Codeforces(commands.Cog):
         await ctx.send(f'Will do the beutification later on!')
         embed = discord.Embed(title="Your Hard75 grind!",description="This is what you achieved!")
         res=cf_common.user_db.get_hard75_LeaderBoard()
+        if res is None: 
+            raise CodeforcesCogError('No One has completed anything as of now - leaderboard is empty!')
         rank=1
         for r in res:
             embed.add_field(name=f'Rank {rank}',value=r)
