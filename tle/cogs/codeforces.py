@@ -52,7 +52,37 @@ class Codeforces(commands.Cog):
             morePointsActive = True
         return morePointsActive
 
+    async def hard75_completed(self, ctx):
+        handle, = await cf_common.resolve_handles(ctx, self.converter, ('!' + str(ctx.author),))
+        user_id = ctx.message.author.id
+        active = cf_common.user_db.check_Hard75Challenge(user_id)
+        if not active:
+            raise CodeforcesCogError(f'You have not been assigned any tasks!')
+        
+        submissions = await cf.user.status(handle=handle)
+        solved = {sub.problem.name for sub in submissions if sub.verdict == 'OK'}
+        c1_id,p1_id,c2_id,p2_id=cf_common.user_db.get_Hard75Challenge(user_id)
+        challenge_id, issue_time, name, contestId, index, delta = active
+        if not name in solved:
+            raise CodeforcesCogError('You haven\'t completed the challenge.')
 
+        score = _calculateGitgudScoreForDelta(delta)
+        finish_time = int(datetime.datetime.now().timestamp())
+        rc = cf_common.user_db.complete_challenge(user_id, challenge_id, finish_time, score)
+
+        now = datetime.datetime.now()
+        start_time, end_time = cf_common.get_start_and_end_of_month(now)
+        now_time = int(now.timestamp())
+
+        morePointsActive = self._check_more_points_active(now_time, start_time, end_time)
+        
+        monthlyPoints = 2 * score if morePointsActive else score
+
+        if rc == 1:
+            duration = cf_common.pretty_time_format(finish_time - issue_time)
+            await ctx.send(f'Challenge completed in {duration}. {handle} gained {score} alltime ranklist points and {monthlyPoints} monthly ranklist points.')
+        else:
+            await ctx.send('You have already claimed your points')
     
     async def _hard75_Retried(self, ctx, handle,contest_id1,idx1,contest_id2,idx2):
         user_id = ctx.author.id
@@ -111,6 +141,86 @@ class Codeforces(commands.Cog):
             raise CodeforcesCogError("Issues while writing to db please contact ACD team!")
         await self._hard75(ctx, handle, problem1,1)
         await self._hard75(ctx, handle, problem2,2)
+    async def _hard75(self, ctx, handle, problem,idx):
+        user_id = ctx.author.id
+        issue_time = datetime.datetime.now().timestamp()
+        #the below code updates it in the DB
+        now = datetime.datetime.now()
+        start_time, end_time = cf_common.get_start_and_end_of_day(now)
+        now_time = int(now.timestamp())
+
+        title = f'{problem.index}. {problem.name}'
+        desc = cf_common.cache2.contest_cache.get_contest(problem.contestId).name
+        embed = discord.Embed(title=title, url=problem.url, description=desc)
+        embed.add_field(name='Rating', value=problem.rating)
+        embed.add_field(name='Alltime points', value=(1))
+        # mention an embed which includes the streak day of the user! 
+        await ctx.send(f'Hard75 problem`#{idx}` for `{handle}` [`{datetime.date.today()}`]', embed=embed)
+
+
+    @commands.command(brief='Hard 75 challenge')
+    @cf_common.user_guard(group='hard75')
+    async def hard75(self,ctx,*args):
+        """
+        The logic behind the bot-
+        -- ;hard75 letsgo
+        Checks in DB if problems have already been assigned for the day 
+            if yes then 
+                if they have been solved then respond accordingly 
+                else respond back with the same problems 
+            else fetch, store (in DB) and return 2 problem (ideally from ACDLadders)
+                1. same level (rounded up) 
+                2. level+ 200 (rounded down)
+        
+        -- ;hard75 completed
+        Checks if problems were assigned to the user on the same day
+            if yes then 
+                if they have solved the problems then
+                    1. update the Hard75 DB-> update streak count properly. 
+                    2. return with his streak count 
+            else respond appropriately
+        
+        -- ;hard75 streak
+            returns the streak of the current user!   
+
+        -- ;hard75 leaderboard
+            returns the leaderboard!-> which player has the longest streak! 
+
+
+            Hard75 DB schema
+            identifier(user)  problem1 , problem2, Streak, lastSolveDate, longesStreak
+        TBD/future scope:
+            1. cron job to automatically mark completed challengs
+            2. add a certificate for people who complete their 75 days challenge
+        """
+        validSuffixes=["letsgo","completed","streak","leaderboard"]
+        
+        if len(args)!=1:
+            await ctx.send('Use the bot properly!')
+            return 
+        elif args[0] not in validSuffixes:
+            await ctx.send('invalid commands used!')
+            return
+        """
+            Use individual functions for each of the above mentioned functionality so as to keep it modular
+        """
+        handle, = await cf_common.resolve_handles(ctx, self.converter, ('!' + str(ctx.author),))
+        user = cf_common.user_db.fetch_cf_user(handle)
+        userCommand=args[0]
+        if(userCommand=="letsgo"):
+            await self._Hard75_letsgo(ctx,handle,user)
+            
+        elif(userCommand=="completed"):
+            # the logic would require implementing the database first!
+            await ctx.send('completed command would get you your status once coded')
+
+        elif(userCommand=="streak"):
+            # the logic would require implementing the database first!
+            await ctx.send('streak command would get you the sreak once coded!')
+
+        elif(userCommand=="leaderboard"):
+            # the logic would require implementing the database first!
+            await ctx.send('leaderboard command would get you the leaderboard once coded!')
 
 
     async def _validate_gitgud_status(self, ctx, delta):
@@ -352,86 +462,6 @@ class Codeforces(commands.Cog):
         embed = discord_common.cf_color_embed(description=msg)
         await ctx.send(f'Mashup contest for `{str_handles}`', embed=embed)
     
-    async def _hard75(self, ctx, handle, problem,idx):
-        user_id = ctx.author.id
-        issue_time = datetime.datetime.now().timestamp()
-        #the below code updates it in the DB
-        now = datetime.datetime.now()
-        start_time, end_time = cf_common.get_start_and_end_of_day(now)
-        now_time = int(now.timestamp())
-
-        title = f'{problem.index}. {problem.name}'
-        desc = cf_common.cache2.contest_cache.get_contest(problem.contestId).name
-        embed = discord.Embed(title=title, url=problem.url, description=desc)
-        embed.add_field(name='Rating', value=problem.rating)
-        embed.add_field(name='Alltime points', value=(1))
-        # mention an embed which includes the streak day of the user! 
-        await ctx.send(f'Hard75 problem`#{idx}` for `{handle}` [`{datetime.date.today()}`]', embed=embed)
-
-
-    @commands.command(brief='Hard 75 challenge')
-    @cf_common.user_guard(group='hard75')
-    async def hard75(self,ctx,*args):
-        """
-        The logic behind the bot-
-        -- ;hard75 letsgo
-        Checks in DB if problems have already been assigned for the day 
-            if yes then 
-                if they have been solved then respond accordingly 
-                else respond back with the same problems 
-            else fetch, store (in DB) and return 2 problem (ideally from ACDLadders)
-                1. same level (rounded up) 
-                2. level+ 200 (rounded down)
-        
-        -- ;hard75 completed
-        Checks if problems were assigned to the user on the same day
-            if yes then 
-                if they have solved the problems then
-                    1. update the Hard75 DB-> update streak count properly. 
-                    2. return with his streak count 
-            else respond appropriately
-        
-        -- ;hard75 streak
-            returns the streak of the current user!   
-
-        -- ;hard75 leaderboard
-            returns the leaderboard!-> which player has the longest streak! 
-
-
-            Hard75 DB schema
-            identifier(user)  problem1 , problem2, Streak, lastSolveDate, longesStreak
-        TBD/future scope:
-            1. cron job to automatically mark completed challengs
-            2. add a certificate for people who complete their 75 days challenge
-        """
-        validSuffixes=["letsgo","completed","streak","leaderboard"]
-        
-        if len(args)!=1:
-            await ctx.send('Use the bot properly!')
-            return 
-        elif args[0] not in validSuffixes:
-            await ctx.send('invalid commands used!')
-            return
-        """
-            Use individual functions for each of the above mentioned functionality so as to keep it modular
-        """
-        handle, = await cf_common.resolve_handles(ctx, self.converter, ('!' + str(ctx.author),))
-        user = cf_common.user_db.fetch_cf_user(handle)
-        userCommand=args[0]
-        if(userCommand=="letsgo"):
-            await self._Hard75_letsgo(ctx,handle,user)
-            
-        elif(userCommand=="completed"):
-            # the logic would require implementing the database first!
-            await ctx.send('completed command would get you your status once coded')
-
-        elif(userCommand=="streak"):
-            # the logic would require implementing the database first!
-            await ctx.send('streak command would get you the sreak once coded!')
-
-        elif(userCommand=="leaderboard"):
-            # the logic would require implementing the database first!
-            await ctx.send('leaderboard command would get you the leaderboard once coded!')
 
 
     @commands.command(brief='Challenge', aliases=['gitbad'],

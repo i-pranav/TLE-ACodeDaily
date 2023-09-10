@@ -129,8 +129,10 @@ class UserDbConn:
             "longest_streak"         INTEGER,
             "c1_id"                  INTEGER,
             "p1_id"                  INTEGER,
+            "p1_name"                TEXT,
             "c2_id"                  INTEGER,
             "p2_id"                  INTEGER,
+            "p2_name"                TEXT,
             "p1_solved"              BOOL,
             "p2_solved"              BOOL,
             "assigned_date"          TEXT,   
@@ -368,17 +370,16 @@ class UserDbConn:
     
     def get_Hard75Challenge(self,user_id):
         query1 = '''
-            SELECT c1_id, p1_id, c2_id, p2_id FROM hard75_challenge
+            SELECT c1_id, p1_id,p1_name, c2_id, p2_id,p2_name FROM hard75_challenge
             WHERE user_id = ? AND assigned_date = ?
         '''
         #the execution assumes that it has been validated that the presence of this row was confirmed! 
         today=datetime.date.today()
-        res=self.conn.execute(query1, (user_id,today)).fetchone()
-        return res[0],res[1],res[2],res[3]
+        return self.conn.execute(query1, (user_id,today)).fetchone()
     
 
 
-    def new_Hard75Challenge(self,user_id,handle,p1_id,c1_id,p2_id,c2_id):   
+    def new_Hard75Challenge(self,user_id,handle,p1_id,c1_id,p1_name,p2_id,c2_id,p2_name):   
         #check for existing record, if exists-> change accordingly else add new row
         query1 = '''
             SELECT current_streak,longest_streak FROM hard75_challenge
@@ -391,10 +392,10 @@ class UserDbConn:
         
         if res is not None:
             query2='''
-            UPDATE hard75_challenge SET p1_id = ?, c1_id = ?, p2_id = ?, c2_id = ?,assigned_date = ?, p1_solved = ?, p2_solved = ?
+            UPDATE hard75_challenge SET p1_id = ?, c1_id = ?, p1_name = ?, p2_id = ?, c2_id = ?, p2_name = ?, assigned_date = ?, p1_solved = ?, p2_solved = ?
             WHERE user_id = ?
             '''
-            cur.execute(query2,(p1_id,c1_id,p2_id,c2_id,today,0,0))
+            cur.execute(query2,(p1_id,c1_id,p1_name,p2_id,c2_id,p2_name,today,0,0))
             #last updated is set to 0 because it's logic wouldn't interfere this way 
             #the entire point of using last updated is that a user shouln't be able to get multiple points for the same day. 
             if cur.rowcount!=1:
@@ -418,11 +419,11 @@ class UserDbConn:
             # 'PRIMARY KEY (user_id)'      
         query3='''
             INSERT INTO hard75_challenge
-            (user_id, handle, current_streak, longest_streak, c1_id, p1_id, c2_id, p2_id,p1_solved,p2_solved,assigned_date,last_updated)
+            (user_id, handle, current_streak, longest_streak, c1_id, p1_id,p1_name c2_id, p2_id,p2_name,p1_solved,p2_solved,assigned_date,last_updated)
             VALUES
             (?, ?, ?, ?, ?, ?, ?, ?, ? ,?, ?, ?)
         '''
-        cur.execute(query3,(user_id,handle,0,0,c1_id,p1_id,c2_id,p2_id,0,0,today,0))
+        cur.execute(query3,(user_id,handle,0,0,c1_id,p1_id,p1_name,c2_id,p2_id,p2_name,0,0,today,0))
         if cur.rowcount!=1:
             self.conn.rollback()
             return 0
