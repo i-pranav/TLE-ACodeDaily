@@ -63,7 +63,7 @@ class DatabaseDisabledError(UserDbError):
 
 class DummyUserDbConn:
     def __getattribute__(self, item):
-        raise DatabaseDisabledError    
+            raise DatabaseDisabledError    
 
 
 class UniqueConstraintFailed(UserDbError):
@@ -98,18 +98,18 @@ class UserDbConn:
                           'ON user_handle (guild_id, handle)')
         self.conn.execute(
             'CREATE TABLE IF NOT EXISTS cf_user_cache ('
-            'handle              TEXT PRIMARY KEY',
-            'first_name          TEXT',
-            'last_name           TEXT',
-            'country             TEXT',
-            'city                TEXT',
-            'organization        TEXT',
-            'contribution        INTEGER',
-            'rating              INTEGER',
-            'maxRating           INTEGER',
-            'last_online_time    INTEGER',
-            'registration_time   INTEGER',
-            'friend_of_count     INTEGER',
+            'handle              TEXT PRIMARY KEY,'
+            'first_name          TEXT,'
+            'last_name           TEXT,'
+            'country             TEXT,'
+            'city                TEXT,'
+            'organization        TEXT,'
+            'contribution        INTEGER,'
+            'rating              INTEGER,'
+            'maxRating           INTEGER,'
+            'last_online_time    INTEGER,'
+            'registration_time   INTEGER,'
+            'friend_of_count     INTEGER,'
             'title_photo         TEXT'
             ')'
         )
