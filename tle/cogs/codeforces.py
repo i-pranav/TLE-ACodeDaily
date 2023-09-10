@@ -132,8 +132,6 @@ class Codeforces(commands.Cog):
         for r in res:
             if(r=="0"):
                 pass
-            if((r)<1000):
-                pass
             names.append(f"<@!{r}>")
         rankArr=[0]*len(names)
         for i in range(0,5):
