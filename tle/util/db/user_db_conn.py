@@ -121,9 +121,11 @@ class UserDbConn:
                 "guild_id"  TEXT
             )
         ''')
-        #had to remove if not exists...revoke it later!
         self.conn.execute('''
-            CREATE TABLE hard75_challenge(
+            DROP TABLE hard75_challenge
+        ''')
+        self.conn.execute('''
+            CREATE TABLE IF NOT EXISTS hard75_challenge(
             "user_id"                TEXT,
             "handle"                 TEXT,
             "current_streak"         INTEGER,
