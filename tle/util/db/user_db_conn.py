@@ -374,7 +374,7 @@ class UserDbConn:
     def get_Hard75UserStat(self,user_id):
         # the assumption is that record exists
         query1 ='''
-            SELECT current_streak,longest_streak FROM hard75_challenge
+            SELECT current_streak, longest_streak FROM hard75_challenge
             WHERE user_id = ?
         '''
         return self.conn.execute(query1,(user_id,)).fetchone()
@@ -391,11 +391,12 @@ class UserDbConn:
         return True
     def updateStreak_Hard75Challenge(self,user_id,current_streak,longest_streak):
         cur = self.conn.cursor()
+        today=datetime.datetime.utcnow().strftime('%Y-%m-%d')
         query1='''
-        UPDATE hard75_challenge SET current_streak = ?,longest_streak = ?
-        WHERE user_id = ?
+            UPDATE hard75_challenge SET current_streak = ?, longest_streak = ?, last_updated = ?
+            WHERE user_id = ?
         '''
-        cur.execute(query1,(current_streak,longest_streak,user_id))
+        cur.execute(query1,(current_streak,longest_streak,today,user_id))
         #last updated is set to 0 because it's logic wouldn't interfere this way 
         #the entire point of using last updated is that a user shouln't be able to get multiple points for the same day. 
         if cur.rowcount!=1:
@@ -405,7 +406,7 @@ class UserDbConn:
         return 1
     def get_Hard75Challenge(self,user_id):
         query1 = '''
-            SELECT c1_id, p1_id, p1_name, c2_id, p2_id,p2_name FROM hard75_challenge
+            SELECT c1_id, p1_id, p1_name, c2_id, p2_id, p2_name FROM hard75_challenge
             WHERE user_id = ? AND assigned_date = ?
         '''
         #the execution assumes that it has been validated that the presence of this row was confirmed! 
@@ -453,7 +454,7 @@ class UserDbConn:
             # 'PRIMARY KEY (user_id)'      
         query3='''
             INSERT INTO hard75_challenge
-            (user_id, handle, current_streak, longest_streak, c1_id, p1_id,p1_name, c2_id, p2_id,p2_name,p1_solved,p2_solved,assigned_date,last_updated)
+            (user_id, handle, current_streak, longest_streak, c1_id, p1_id, p1_name, c2_id, p2_id, p2_name, p1_solved, p2_solved, assigned_date, last_updated)
             VALUES
             (?, ?, ?, ?, ?, ?, ?, ?, ? ,?, ?, ?, ?, ?)
         '''
@@ -463,11 +464,6 @@ class UserDbConn:
             return 0
         self.conn.commit()
         return 1
-
-    #the below 3 methods would be coded once 1st has been rightly implemented        
-    def complete_hard75(self,user_id):
-        pass 
-        #this should update the current streak and also the longest streak if required. 
     
     def get_hard75_status(self,userid):
         pass
