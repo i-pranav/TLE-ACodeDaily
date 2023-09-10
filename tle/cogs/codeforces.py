@@ -63,7 +63,6 @@ class Codeforces(commands.Cog):
         submissions = await cf.user.status(handle=handle)
         solved = {sub.problem.name for sub in submissions if sub.verdict == 'OK'}
         c1_id,p1_id,p1_name,c2_id,p2_id,p2_name=cf_common.user_db.get_Hard75Challenge(user_id)
-        challenge_id, issue_time, name, contestId, index, delta = active
 
         if not p1_name in solved and not p2_name in solved:
             raise CodeforcesCogError('You haven\'t completed either of the problems!.')
