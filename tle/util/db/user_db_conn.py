@@ -366,7 +366,7 @@ class UserDbConn:
         # the assumption is that record exists
         # returns the assigned_date and the last_updated date. 
         query1 ='''
-            SELECT assigned_date,last_updated from hard75_challenge
+            SELECT assigned_date, last_updated from hard75_challenge
             WHERE user_id = ?
         '''
         return self.conn.execute(query1,(user_id))
@@ -391,7 +391,6 @@ class UserDbConn:
         return True
     def updateStreak_Hard75Challenge(self,user_id,current_streak,longest_streak):
         cur = self.conn.cursor()
-        res=self.conn.execute(query1,(user_id,today)).fetchone()
         query1='''
         UPDATE hard75_challenge SET current_streak = ?,longest_streak = ?
         WHERE user_id = ?
