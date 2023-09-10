@@ -121,8 +121,9 @@ class UserDbConn:
                 "guild_id"  TEXT
             )
         ''')
+        #had to remove if not exists...revoke it later!
         self.conn.execute('''
-            CREATE TABLE IF NOT EXISTS hard75_challenge(
+            CREATE TABLE hard75_challenge(
             "user_id"                TEXT,
             "handle"                 TEXT,
             "current_streak"         INTEGER,
@@ -370,7 +371,7 @@ class UserDbConn:
     
     def get_Hard75Challenge(self,user_id):
         query1 = '''
-            SELECT c1_id, p1_id,p1_name, c2_id, p2_id,p2_name FROM hard75_challenge
+            SELECT c1_id, p1_id, p1_name, c2_id, p2_id,p2_name FROM hard75_challenge
             WHERE user_id = ? AND assigned_date = ?
         '''
         #the execution assumes that it has been validated that the presence of this row was confirmed! 
@@ -419,7 +420,7 @@ class UserDbConn:
             # 'PRIMARY KEY (user_id)'      
         query3='''
             INSERT INTO hard75_challenge
-            (user_id, handle, current_streak, longest_streak, c1_id, p1_id,p1_name c2_id, p2_id,p2_name,p1_solved,p2_solved,assigned_date,last_updated)
+            (user_id, handle, current_streak, longest_streak, c1_id, p1_id,p1_name, c2_id, p2_id,p2_name,p1_solved,p2_solved,assigned_date,last_updated)
             VALUES
             (?, ?, ?, ?, ?, ?, ?, ?, ? ,?, ?, ?)
         '''
