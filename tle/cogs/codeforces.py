@@ -104,11 +104,13 @@ class Codeforces(commands.Cog):
         problems2.sort(key=lambda problem: cf_common.cache2.contest_cache.get_contest(problem.contestId).startTimeSeconds)
         choice1 = max(random.randrange(len(problems1)) for _ in range(5))
         choice2 = max(random.randrange(len(problems2)) for _ in range(5))
-        res=cf_common.user_db.new_Hard75Challenge(user_id,handle,p1_id,c1_id,p2_id,c2_id)
+        problem1=problems1[choice1]
+        problem2=problems2[choice2]
+        res=cf_common.user_db.new_Hard75Challenge(user_id,handle,problem1.index,problem1.contestId,problem2.index,problem2.contestId)
         if res!=1:
             raise CodeforcesCogError("Issues while writing to db please contact ACD team!")
-        await self._hard75(ctx, handle, problems1[choice1],1)
-        await self._hard75(ctx, handle, problems2[choice2],2)
+        await self._hard75(ctx, handle, problem1,1)
+        await self._hard75(ctx, handle, problem2,2)
 
 
     async def _validate_gitgud_status(self, ctx, delta):
