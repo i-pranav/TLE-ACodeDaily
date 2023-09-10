@@ -103,7 +103,7 @@ class UserDbConn:
             'c2_id                  INTEGER',
             'p2_id                  INTEGER',
             'p1_solved              BOOL',
-            'p2_solved              BOOL'
+            'p2_solved              BOOL',
             'assigned_date          TEXT',   
             'last_updated           TEXT',
             'PRIMARY KEY (user_id)'      
