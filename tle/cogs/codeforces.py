@@ -64,15 +64,17 @@ class Codeforces(commands.Cog):
         solved = {sub.problem.name for sub in submissions if sub.verdict == 'OK'}
         c1_id,p1_id,p1_name,c2_id,p2_id,p2_name=cf_common.user_db.get_Hard75Challenge(user_id)
 
-        if not p1_name in solved and not p2_name in solved:
-            raise CodeforcesCogError('You haven\'t completed either of the problems!.')
-        if not p1_name in solved:
-            raise CodeforcesCogError('You haven\'t completed the problem1!!.')
-        if not p2_name in solved:
-            raise CodeforcesCogError('You haven\'t completed the problem2!!.')
+        #commenting below for testing purposes!
+
+        # if not p1_name in solved and not p2_name in solved:
+        #     raise CodeforcesCogError('You haven\'t completed either of the problems!.')
+        # if not p1_name in solved:
+        #     raise CodeforcesCogError('You haven\'t completed the problem1!!.')
+        # if not p2_name in solved:
+        #     raise CodeforcesCogError('You haven\'t completed the problem2!!.')
         # else I need to update accordingly... 
         today=datetime.datetime.utcnow().strftime('%Y-%m-%d')
-        assigned_date,last_update=cf_common.user_db.get_Hard75Date(user_id);
+        assigned_date,last_update=cf_common.user_db.get_Hard75Date(user_id)
         if(last_update==today):
             ctx.send(f"Your progress has already been updated for `{today}`")
             return
