@@ -93,7 +93,7 @@ class UserDbConn:
             'PRIMARY KEY (user_id, guild_id)'
             ')'
         )
-        self.conn.execute('CREATE TABLE IF NOT EXISTS hard75_challenge('
+        self.conn.execute('CREATE TABLE IF NOT EXISTS hard75_challenge ('
             'user_id                TEXT',
             'handle                 TEXT',
             'current_streak         INTEGER',
@@ -106,7 +106,8 @@ class UserDbConn:
             'p2_solved              BOOL',
             'assigned_date          TEXT',   
             'last_updated           TEXT',
-            'PRIMARY KEY (user_id)'      
+            'PRIMARY KEY (user_id)'
+            ')'      
         )
         self.conn.execute('CREATE UNIQUE INDEX IF NOT EXISTS ix_user_handle_guild_handle '
                           'ON user_handle (guild_id, handle)')
