@@ -361,12 +361,30 @@ class UserDbConn:
         self.conn.row_factory = None
         return res
     
+
+    def get_Hard75Date(self,user_id):
+        # the assumption is that record exists
+        # returns the assigned_date and the last_updated date. 
+        query1 ='''
+            SELECT assigned_date,last_updated from hard75_challenge
+            WHERE user_id = ?
+        '''
+        return self.conn.execute(query1,(user_id))
+
+    def get_Hard75UserStat(self,user_id):
+        # the assumption is that record exists
+        query1 ='''
+            SELECT current_streak,longest_streak from hard75_challenge
+            WHERE user_id = ?
+        '''
+        return self.conn.execute(query1,(user_id))
+
     def check_Hard75Challenge(self,user_id):
         query1 = '''
             SELECT * FROM hard75_challenge
             WHERE user_id = ? AND assigned_date = ?
         '''
-        today=datetime.date.today()
+        today=datetime.datetime.utcnow().strftime('%Y-%m-%d')
         res = self.conn.execute(query1, (user_id,today)).fetchone()
         if res is None: #need to start a new challenge! 
             return False
@@ -378,7 +396,7 @@ class UserDbConn:
             WHERE user_id = ? AND assigned_date = ?
         '''
         #the execution assumes that it has been validated that the presence of this row was confirmed! 
-        today=datetime.date.today()
+        today=datetime.datetime.utcnow().strftime('%Y-%m-%d')
         return self.conn.execute(query1, (user_id,today)).fetchone()
     
 
@@ -389,7 +407,7 @@ class UserDbConn:
             SELECT current_streak,longest_streak FROM hard75_challenge
             WHERE user_id = ? AND assigned_date = ?
         '''
-        today=datetime.date.today()
+        today=datetime.datetime.utcnow().strftime('%Y-%m-%d')
 
         cur = self.conn.cursor()
         res=self.conn.execute(query1,(user_id,today)).fetchone()
