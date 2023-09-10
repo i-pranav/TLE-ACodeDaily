@@ -88,12 +88,13 @@ class Codeforces(commands.Cog):
         yesterday=yesterday.strftime('%Y-%m-%d')
 
         #check if streak continues!
-        
         if(last_update==yesterday):
             current_streak+=1
 
         if(current_streak==0):      # on first day!
             current_streak=1    
+
+        await ctx.send(f'val1: {current_streak} val2: {longest_streak}')
         current_streak=10
         longest_streak=max(current_streak,longest_streak)
         rc=cf_common.user_db.updateStreak_Hard75Challenge(user_id,current_streak,longest_streak)
@@ -103,7 +104,7 @@ class Codeforces(commands.Cog):
         embed.add_field(name='current streak', value=(current_streak))
         embed.add_field(name='longest streak', value=(longest_streak))
         
-        # mention an embed which includes the streak day of the user! 
+        # mention an embed which includes the streak d  ay of the user! 
         await ctx.send(f'Hi `{handle}`! You have completed your daily challenge for {today} ', embed=embed)
 
     
@@ -113,7 +114,6 @@ class Codeforces(commands.Cog):
         now = datetime.datetime.now()
         start_time, end_time = cf_common.get_start_and_end_of_day(now)
         now_time = int(now.timestamp())
-
         url1 = f'{cf.CONTEST_BASE_URL}{contest_id1}/problem/{idx1}'
         url2 = f'{cf.CONTEST_BASE_URL}{contest_id2}/problem/{idx2}'
         embed = discord.Embed(description="Get your daily task done!")
