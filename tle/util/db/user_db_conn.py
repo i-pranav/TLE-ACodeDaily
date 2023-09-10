@@ -93,23 +93,7 @@ class UserDbConn:
             'PRIMARY KEY (user_id, guild_id)'
             ')'
         )
-        self.conn.execute(
-            'CREATE TABLE IF NOT EXISTS hard75_challenge ('
-            'user_id                TEXT',
-            'handle                 TEXT',
-            'current_streak         INTEGER',
-            'longest_streak         INTEGER',
-            'c1_id                  INTEGER',
-            'p1_id                  INTEGER',
-            'c2_id                  INTEGER',
-            'p2_id                  INTEGER',
-            'p1_solved              BOOL',
-            'p2_solved              BOOL',
-            'assigned_date          TEXT',   
-            'last_updated           TEXT',
-            'PRIMARY KEY (user_id)'
-            ')'      
-        )
+
         self.conn.execute('CREATE UNIQUE INDEX IF NOT EXISTS ix_user_handle_guild_handle '
                           'ON user_handle (guild_id, handle)')
         self.conn.execute(
@@ -136,6 +120,22 @@ class UserDbConn:
                 "rating"	INTEGER NOT NULL,
                 "guild_id"  TEXT
             )
+        ''')
+        self.conn.execute('''
+            CREATE TABLE IF NOT EXISTS hard75_challenge(
+            "user_id"                TEXT,
+            "handle"                 TEXT,
+            "current_streak"         INTEGER,
+            "longest_streak"         INTEGER,
+            "c1_id"                  INTEGER,
+            "p1_id"                  INTEGER,
+            "c2_id"                  INTEGER,
+            "p2_id"                  INTEGER,
+            "p1_solved"              BOOL,
+            "p2_solved"              BOOL,
+            "assigned_date"          TEXT,   
+            "last_updated"           TEXT
+            )      
         ''')
         self.conn.execute('''
             CREATE TABLE IF NOT EXISTS duel(
