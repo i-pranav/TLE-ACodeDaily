@@ -93,7 +93,8 @@ class UserDbConn:
             'PRIMARY KEY (user_id, guild_id)'
             ')'
         )
-        self.conn.execute('CREATE TABLE IF NOT EXISTS hard75_challenge ('
+        self.conn.execute(
+            'CREATE TABLE IF NOT EXISTS hard75_challenge ('
             'user_id                TEXT',
             'handle                 TEXT',
             'current_streak         INTEGER',
