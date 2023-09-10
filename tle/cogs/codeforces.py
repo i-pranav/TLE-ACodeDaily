@@ -363,7 +363,7 @@ class Codeforces(commands.Cog):
         handle, = await cf_common.resolve_handles(ctx, self.converter, ('!' + str(ctx.author),))
         user = cf_common.user_db.fetch_cf_user(handle)
         rating = round(user.effective_rating, -2)
-        rating = max(1100, rating)
+        rating = max(800, rating)
         rating = min(3000, rating)
         rating1 = rating            # this is the rating for the problem 1
         rating2 = rating1+200       # this is the rating for the problem 2
