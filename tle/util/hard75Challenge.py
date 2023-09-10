@@ -78,3 +78,8 @@ class Hard75Challenge(commands.Cog):
             await ctx.send('streak command would get you the sreak once coded!')
         elif(userCommand=="leaderboard"):
             await ctx.send('leaderboard command would get you the leaderboard once coded!')
+
+
+
+async def setup(bot):
+    await bot.add_cog(Hard75Challenge(bot))
