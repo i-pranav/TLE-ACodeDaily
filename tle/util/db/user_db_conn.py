@@ -387,7 +387,7 @@ class UserDbConn:
         today=datetime.date.today()
 
         cur = self.conn.cursor()
-        res=self.conn.execute(query1,(user_id)).fetchone()
+        res=self.conn.execute(query1,(user_id,today)).fetchone()
         
         if res is not None:
             query2='''
