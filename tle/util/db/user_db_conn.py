@@ -369,8 +369,8 @@ class UserDbConn:
             SELECT assigned_date, last_updated from hard75_challenge
             WHERE user_id = ?
         '''
-        return self.conn.execute(query1,(user_id)).fetchone()
-
+        res=self.conn.execute(query1,(user_id)).fetchone()
+        return res[0],res[1]
     def get_Hard75UserStat(self,user_id):
         # the assumption is that record exists
         query1 ='''
