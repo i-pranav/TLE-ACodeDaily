@@ -158,6 +158,9 @@ class Codeforces(commands.Cog):
         await ctx.send(f'Thanks for participating in the challenge!', embed=embed)
 
 
+
+
+
     async def _Hard75_letsgo(self,ctx,handle,user):
         user_id = ctx.author.id
         activeChallenge= cf_common.user_db.check_Hard75Challenge(user_id)
@@ -216,13 +219,6 @@ class Codeforces(commands.Cog):
 
 
     async def _hard75(self, ctx, handle, problem,idx):
-        user_id = ctx.author.id
-        issue_time = datetime.datetime.now().timestamp()
-        #the below code updates it in the DB
-        now = datetime.datetime.now()
-        start_time, end_time = cf_common.get_start_and_end_of_day(now)
-        now_time = int(now.timestamp())
-
         title = f'{problem.index}. {problem.name}'
         desc = cf_common.cache2.contest_cache.get_contest(problem.contestId).name
         embed = discord.Embed(title=title, url=problem.url, description=desc)
