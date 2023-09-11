@@ -170,9 +170,9 @@ class Codeforces(commands.Cog):
             if p1_name in solved and p2_name in solved:
                 dt = datetime.datetime.now()
                 timeLeft=((24 - dt.hour - 1) * 60 * 60) + ((60 - dt.minute - 1) * 60) + (60 - dt.second)
-                h=timeLeft/3600
-                m=(timeLeft-h*3600)/60
-                embed = discord.Embed(title="Life isn't just about coding!",description=f"You need to wait {timeLeft}!")
+                h=int(timeLeft/3600)
+                m=int((timeLeft-h*3600)/60)
+                embed = discord.Embed(title="Life isn't just about coding!",description=f"You need to wait {handle}!")
                 embed.add_field(name='Time Remaining for next challenge', value=f"{h} Hours : {m} Mins")
                 await ctx.send(f'You have already completed todays challenge! Life isn\'t just about coding!! Go home, talk to family and friends, touch grass, hit the gym!', embed=embed)
                 return
