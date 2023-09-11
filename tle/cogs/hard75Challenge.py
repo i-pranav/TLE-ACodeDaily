@@ -34,7 +34,7 @@ class Hard75Challenge(commands.Cog):
     async def hard75(self,ctx,*args):
         """
         Hard75 is a challenge mode. The goal is to solve 2 codeforces problems every day for 75 days.
-        You can request your daily problems by using the ;hard75 letsgo
+        You can request your daily problems by using ;hard75 letsgo
         If you manage to solve both problem till midnight (IST) your current streak increases. If you don't solve both problems or miss a single day your streak will reset back to 0.
         The bot will keep track of your streak (current and longest) and there is also a leaderboard for the top contestants.
         """
@@ -98,7 +98,14 @@ class Hard75Challenge(commands.Cog):
         await ctx.send(f'Hi `{handle}`! You have completed your daily challenge for {today} ', embed=embed)
 
     
-    async def _hard75_Retried(self, ctx, handle,contest_id1,idx1,contest_id2,idx2):
+    async def _postProblemEmbed(self, ctx, handle, problem,idx):
+        title = f'{problem.index}. {problem.name}'
+        desc = cf_common.cache2.contest_cache.get_contest(problem.contestId).name
+        embed = discord.Embed(title=title, url=problem.url, description=desc)
+        embed.add_field(name='Rating', value=problem.rating)
+        await ctx.send(f'Hard75 problem`#{idx}` for `{handle}` [`{datetime.datetime.utcnow().strftime("%Y-%m-%d")}`]', embed=embed)
+
+    async def _repostProblems(self, ctx, handle,contest_id1,idx1,contest_id2,idx2):
         user_id = ctx.author.id
         issue_time = datetime.datetime.now().timestamp()
         now = datetime.datetime.now()
@@ -158,9 +165,6 @@ class Hard75Challenge(commands.Cog):
         embed.add_field(name='last problem solved on', value=last_updated)
         await ctx.send(f'Thanks for participating in the challenge!', embed=embed)
 
-
-
-
     @hard75.command(brief='Request hard75 problems for today')
     @cf_common.user_guard(group='hard75')
     async def letsgo(self,ctx):
@@ -190,7 +194,7 @@ class Hard75Challenge(commands.Cog):
                 await ctx.send(f'You have already completed todays challenge! Life isn\'t just about coding!! Go home, talk to family and friends, touch grass, hit the gym!', embed=embed)
                 return
             #else return that problems have already been assigned.
-            await self._hard75_Retried(ctx,handle,c1_id,p1_id,c2_id,p2_id)
+            await self._repostProblems(ctx,handle,c1_id,p1_id,c2_id,p2_id)
             return
         rating = round(user.effective_rating, -2)
         rating = max(800, rating)
@@ -223,17 +227,9 @@ class Hard75Challenge(commands.Cog):
         res=cf_common.user_db.new_Hard75Challenge(user_id,handle,problem1.index,problem1.contestId,problem1.name,problem2.index,problem2.contestId,problem2.name)
         if res!=1:
             raise Hard75CogError("Issues while writing to db please contact ACD team!")
-        await self._hard75(ctx, handle, problem1,1)
-        await self._hard75(ctx, handle, problem2,2)
+        await self._postProblemEmbed(ctx, handle, problem1,1)
+        await self._postProblemEmbed(ctx, handle, problem2,2)
 
-
-
-    async def _hard75(self, ctx, handle, problem,idx):
-        title = f'{problem.index}. {problem.name}'
-        desc = cf_common.cache2.contest_cache.get_contest(problem.contestId).name
-        embed = discord.Embed(title=title, url=problem.url, description=desc)
-        embed.add_field(name='Rating', value=problem.rating)
-        await ctx.send(f'Hard75 problem`#{idx}` for `{handle}` [`{datetime.datetime.utcnow().strftime("%Y-%m-%d")}`]', embed=embed)
 
     @discord_common.send_error_if(Hard75CogError, cf_common.ResolveHandleError,
                                   cf_common.FilterError)
