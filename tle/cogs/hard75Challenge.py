@@ -33,27 +33,19 @@ class Hard75Challenge(commands.Cog):
     @cf_common.user_guard(group='hard75')
     async def hard75(self,ctx,*args):
         """
-        These are the 4 commands which the hard75 script supports
-        -- ;hard75 letsgo
-        get 2 problems( would be fetched from ACDLadders later)
-                1. same level*
-                2. level+ 200*
-                *-> both of them are rounded to the nearest 100
-        
-        -- ;hard75 completed
-        use this command once you have completed both the problems to let the system know that you completed both the tasks 
-        
-        -- ;hard75 streak
-            get your streak i.e. current and longest and the last day you completed the challenge
-
-        -- ;hard75 leaderboard
-            get the top 5 contestants (based on longest streak)
+        Hard75 is a challenge mode. The goal is to solve 2 codeforces problems every day for 75 days.
+        You can request your daily problems by using the ;hard75 letsgo
+        If you manage to solve both problem till midnight (IST) your current streak increases. If you don't solve both problems or miss a single day your streak will reset back to 0.
+        The bot will keep track of your streak (current and longest) and there is also a leaderboard for the top contestants.
         """
         await ctx.send_help(ctx.command)
 
     @hard75.command(brief='Mark hard75 problems for today as completed')
     @cf_common.user_guard(group='hard75')
     async def completed(self, ctx):
+        """
+        Use this command once you have completed both of your daily problems
+        """        
         handle, = await cf_common.resolve_handles(ctx, self.converter, ('!' + str(ctx.author),))
         user_id = ctx.message.author.id
         active = cf_common.user_db.check_Hard75Challenge(user_id)
@@ -125,6 +117,9 @@ class Hard75Challenge(commands.Cog):
     @hard75.command(brief='Get Hard75 leaderboard')
     @cf_common.user_guard(group='hard75')    
     async def leaderboard(self,ctx):
+        """
+        Ranklist of the top 5 contestants (based on longest streak)
+        """
         embed = discord.Embed(title="Your Hard75 grind!",description="This is what you achieved!")
         res=cf_common.user_db.get_hard75_LeaderBoard()
         if res is None: 
@@ -148,6 +143,9 @@ class Hard75Challenge(commands.Cog):
     @hard75.command(brief='Get users streak statistics')
     @cf_common.user_guard(group='hard75')
     async def streak(self,ctx):
+        """
+        See your progress on the challenge 
+        """        
         user_id=ctx.author.id
         res=cf_common.user_db.get_hard75_status(user_id)
         if res is None:
@@ -166,6 +164,12 @@ class Hard75Challenge(commands.Cog):
     @hard75.command(brief='Request hard75 problems for today')
     @cf_common.user_guard(group='hard75')
     async def letsgo(self,ctx):
+        """
+        Assigns 2 problems per day (would be fetched from ACDLadders later)
+                1. same level*
+                2. level+ 200*
+                *-> both of them are rounded to the nearest 100
+        """        
         handle, = await cf_common.resolve_handles(ctx, self.converter, ('!' + str(ctx.author),))
         user = cf_common.user_db.fetch_cf_user(handle)
         user_id = ctx.author.id
@@ -230,38 +234,6 @@ class Hard75Challenge(commands.Cog):
         embed = discord.Embed(title=title, url=problem.url, description=desc)
         embed.add_field(name='Rating', value=problem.rating)
         await ctx.send(f'Hard75 problem`#{idx}` for `{handle}` [`{datetime.datetime.utcnow().strftime("%Y-%m-%d")}`]', embed=embed)
-
-
-
-
-        # validSuffixes=["letsgo","completed","streak","leaderboard"]
-        
-        # if len(args)!=1:
-        #     await ctx.send('Use the bot properly!')
-        #     return 
-        # elif args[0] not in validSuffixes:
-        #     await ctx.send('invalid commands used!')
-        #     return
-        # """
-        #     Use individual functions for each of the above mentioned functionality so as to keep it modular
-        # """
-        # userCommand=args[0]
-        # if(userCommand=="letsgo"):
-        #     await self._Hard75_letsgo(ctx,handle,user)
-            
-        # elif(userCommand=="completed"):
-        #     await self._hard75_completed(ctx)
-
-        # elif(userCommand=="streak"):
-        #     await self._Hard75_streak(ctx)
-        #     # the logic would require implementing the database first!
-        #     # await ctx.send('streak command would get you the sreak once coded!')
-
-        # elif(userCommand=="leaderboard"):
-        #     await self._Hard75_Leaderboard(ctx)
-        #     # the logic would require implementing the database first!
-        #     # await ctx.send('leaderboard command would get you the leaderboard once coded!')
-
 
     @discord_common.send_error_if(Hard75CogError, cf_common.ResolveHandleError,
                                   cf_common.FilterError)
