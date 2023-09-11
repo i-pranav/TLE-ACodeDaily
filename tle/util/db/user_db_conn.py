@@ -423,12 +423,12 @@ class UserDbConn:
         #check for existing record, if exists-> change accordingly else add new row
         query1 = '''
             SELECT current_streak,longest_streak FROM hard75_challenge
-            WHERE user_id = ? AND assigned_date = ?
+            WHERE user_id = ?
         '''
         today=datetime.datetime.utcnow().strftime('%Y-%m-%d')
 
         cur = self.conn.cursor()
-        res=self.conn.execute(query1,(user_id,today)).fetchone()
+        res=self.conn.execute(query1,(user_id,)).fetchone()
         
         if res is not None:
             query2='''
