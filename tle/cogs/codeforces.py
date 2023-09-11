@@ -220,36 +220,21 @@ class Codeforces(commands.Cog):
     @cf_common.user_guard(group='hard75')
     async def hard75(self,ctx,*args):
         """
-        The logic behind the bot-
+        These are the 4 commands which the hard75 script supports
         -- ;hard75 letsgo
-        Checks in DB if problems have already been assigned for the day 
-            if yes then 
-                if they have been solved then respond accordingly 
-                else respond back with the same problems 
-            else fetch, store (in DB) and return 2 problem (ideally from ACDLadders)
-                1. same level (rounded up) 
-                2. level+ 200 (rounded down)
+        get 2 problems( would be fetched from ACDLadders later)
+                1. same level*
+                2. level+ 200*
+                *-> both of them are rounded to the nearest 100
         
         -- ;hard75 completed
-        Checks if problems were assigned to the user on the same day
-            if yes then 
-                if they have solved the problems then
-                    1. update the Hard75 DB-> update streak count properly. 
-                    2. return with his streak count 
-            else respond appropriately
+        use this command once you have completed both the problems to let the system know that you completed both the tasks 
         
         -- ;hard75 streak
-            returns the streak of the current user!   
+            get your streak i.e. current and longest and the last day you completed the challenge
 
         -- ;hard75 leaderboard
-            returns the leaderboard!-> which player has the longest streak! 
-
-
-            Hard75 DB schema
-            identifier(user)  problem1 , problem2, Streak, lastSolveDate, longesStreak
-        TBD/future scope:
-            1. cron job to automatically mark completed challengs
-            2. add a certificate for people who complete their 75 days challenge
+            get the top 5 contestants (based on longest streak)
         """
         validSuffixes=["letsgo","completed","streak","leaderboard"]
         
