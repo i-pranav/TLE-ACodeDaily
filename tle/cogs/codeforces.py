@@ -163,6 +163,19 @@ class Codeforces(commands.Cog):
         activeChallenge= cf_common.user_db.check_Hard75Challenge(user_id)
         if activeChallenge:     # problems are already there simply return from the DB 
             c1_id,p1_id,p1_name,c2_id,p2_id,p2_name=cf_common.user_db.get_Hard75Challenge(user_id)
+
+            #check if problem is already solved... if so respond appropriately.
+            submissions = await cf.user.status(handle=handle)
+            if p1_name in submissions and p2_name in submissions:
+                dt = datetime.datetime.now()
+                timeLeft=((24 - dt.hour - 1) * 60 * 60) + ((60 - dt.minute - 1) * 60) + (60 - dt.second)
+                h=timeLeft/3600
+                m=(timeLeft-h*3600)/60
+                embed = discord.Embed(title="Life isn't just about coding!",description=f"You need to wait {timeLeft}!")
+                embed.add_field(name='Time Remaining for next challenge', value=f"{h} Hours : {m} Mins")
+                await ctx.send(f'You have already completed todays challenge! Life isn\'t just about coding!! Go home, talk to family and friends, touch grass, hit the gym!', embed=embed)
+                return
+            #else return that problems have already been assigned.
             await self._hard75_Retried(ctx,handle,c1_id,p1_id,c2_id,p2_id)
             return
         rating = round(user.effective_rating, -2)
