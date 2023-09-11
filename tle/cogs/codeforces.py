@@ -163,6 +163,19 @@ class Codeforces(commands.Cog):
         activeChallenge= cf_common.user_db.check_Hard75Challenge(user_id)
         if activeChallenge:     # problems are already there simply return from the DB 
             c1_id,p1_id,p1_name,c2_id,p2_id,p2_name=cf_common.user_db.get_Hard75Challenge(user_id)
+
+            #check if problem is already solved... if so respond appropriately.
+            submissions = await cf.user.status(handle=handle)
+            if p1_name in submissions and p2_name in submissions:
+                dt = datetime.datetime.now()
+                timeLeft=((24 - dt.hour - 1) * 60 * 60) + ((60 - dt.minute - 1) * 60) + (60 - dt.second)
+                h=timeLeft/3600
+                m=(timeLeft-h*3600)/60
+                embed = discord.Embed(title="Life isn't just about coding!",description=f"You need to wait {timeLeft}!")
+                embed.add_field(name='Time Remaining for next challenge', value=f"{h} Hours : {m} Mins")
+                await ctx.send(f'You have already completed todays challenge! Life isn\'t just about coding!! Go home, talk to family and friends, touch grass, hit the gym!', embed=embed)
+                return
+            #else return that problems have already been assigned.
             await self._hard75_Retried(ctx,handle,c1_id,p1_id,c2_id,p2_id)
             return
         rating = round(user.effective_rating, -2)
@@ -220,36 +233,21 @@ class Codeforces(commands.Cog):
     @cf_common.user_guard(group='hard75')
     async def hard75(self,ctx,*args):
         """
-        The logic behind the bot-
+        These are the 4 commands which the hard75 script supports
         -- ;hard75 letsgo
-        Checks in DB if problems have already been assigned for the day 
-            if yes then 
-                if they have been solved then respond accordingly 
-                else respond back with the same problems 
-            else fetch, store (in DB) and return 2 problem (ideally from ACDLadders)
-                1. same level (rounded up) 
-                2. level+ 200 (rounded down)
+        get 2 problems( would be fetched from ACDLadders later)
+                1. same level*
+                2. level+ 200*
+                *-> both of them are rounded to the nearest 100
         
         -- ;hard75 completed
-        Checks if problems were assigned to the user on the same day
-            if yes then 
-                if they have solved the problems then
-                    1. update the Hard75 DB-> update streak count properly. 
-                    2. return with his streak count 
-            else respond appropriately
+        use this command once you have completed both the problems to let the system know that you completed both the tasks 
         
         -- ;hard75 streak
-            returns the streak of the current user!   
+            get your streak i.e. current and longest and the last day you completed the challenge
 
         -- ;hard75 leaderboard
-            returns the leaderboard!-> which player has the longest streak! 
-
-
-            Hard75 DB schema
-            identifier(user)  problem1 , problem2, Streak, lastSolveDate, longesStreak
-        TBD/future scope:
-            1. cron job to automatically mark completed challengs
-            2. add a certificate for people who complete their 75 days challenge
+            get the top 5 contestants (based on longest streak)
         """
         validSuffixes=["letsgo","completed","streak","leaderboard"]
         
