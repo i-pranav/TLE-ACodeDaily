@@ -215,6 +215,16 @@ def get_start_and_end_of_month(time):
     end_time = int(time.timestamp())
     return start_time, end_time
 
+def get_start_and_end_of_day(time):     # needs editing -> TODO: make it return the start of day i.e. UTC 00:00
+    time = time.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    start_time = int(time.timestamp())
+    if time.month == 12:
+        time = time.replace(month=1,year=time.year+1)
+    else:
+        time = time.replace(month=time.month+1)
+    end_time = int(time.timestamp())
+    return start_time, end_time
+
 
 def days_ago(t):
     days = (time.time() - t)/(60*60*24)

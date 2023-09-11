@@ -118,7 +118,6 @@ def on_ready_event_once(bot):
 
     return register_on_ready
 
-
 async def presence(bot):
     await bot.change_presence(activity=discord.Activity(
         type=discord.ActivityType.listening,
@@ -130,11 +129,10 @@ async def presence(bot):
     async def presence_task(_):
         while True:
             target = random.choice([
-                member for member in bot.get_all_members()
-                if 'Purgatory' not in {role.name for role in member.roles}
-            ])
+                "i_pranav","badal_arya","abhi_wd",
+                "thoughtlessnerd","hikaku","HimanshuRaj","rahul7_77","kaushik","pirate king","denjell","harsh rishi miglani"])
             await bot.change_presence(activity=discord.Game(
-                name=f'{target.display_name} orz'))
+                name=f'{target} orz'))
             await asyncio.sleep(10 * 60)
 
     presence_task.start()
