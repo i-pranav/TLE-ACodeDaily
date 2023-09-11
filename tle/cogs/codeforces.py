@@ -166,7 +166,8 @@ class Codeforces(commands.Cog):
 
             #check if problem is already solved... if so respond appropriately.
             submissions = await cf.user.status(handle=handle)
-            if p1_name in submissions and p2_name in submissions:
+            solved = {sub.problem.name for sub in submissions if sub.verdict == 'OK'}
+            if p1_name in submissions and p2_name in solved:
                 dt = datetime.datetime.now()
                 timeLeft=((24 - dt.hour - 1) * 60 * 60) + ((60 - dt.minute - 1) * 60) + (60 - dt.second)
                 h=timeLeft/3600
