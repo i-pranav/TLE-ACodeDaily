@@ -131,6 +131,9 @@ class Hard75Challenge(commands.Cog):
         res=cf_common.user_db.get_hard75_LeaderBoard()
         if res is None: 
             raise Hard75CogError('No One has completed anything as of now - leaderboard is empty!')
+
+        data = [(ctx.guild.get_member(user_id), longest_streak, current_streak)
+                 for user_id, longest_streak, current_streak in cf_common.user_db.get_hard75_LeaderBoard()]
         # names=[]
         # for r in res:
         #     names.append(f"<@!{r[0]}>")
@@ -156,17 +159,16 @@ class Hard75Challenge(commands.Cog):
             for index, (member, longestStreak, currentStreak) in enumerate(chunk):
                 lstreakstr = f'{longestStreak}' 
                 cstreakstr = f'{currentStreak}' 
-                mentionstr = f"<@!{member}>"
+                memberstr  = f'{member}'
                 t += table.Data(_PER_PAGE * page_num + index + 1,
-                                mentionstr, lstreakstr, cstreakstr)
+                                memberstr, lstreakstr, cstreakstr)
 
-            table_str = f'\n{t}\n'
-            embed = discord_common.cf_color_embed()
-            embed.add_field(name = 'Leaderboard', value = table_str, inline = True)
+            table_str = f'```\n{t}\n```'
+            embed = discord_common.cf_color_embed(description = table_str)
             return 'Leaderboard', embed
 
         pages = [make_page(chunk, k) for k, chunk in enumerate(
-            paginator.chunkify(res, _PER_PAGE))]
+            paginator.chunkify(data, _PER_PAGE))]
         paginator.paginate(self.bot, ctx.channel, pages,
                            wait_time=5 * 60, set_pagenum_footers=True)        
     
