@@ -35,7 +35,7 @@ class Hard75Challenge(commands.Cog):
         """
         Hard75 is a challenge mode. The goal is to solve 2 codeforces problems every day for 75 days.
         You can request your daily problems by using ;hard75 letsgo
-        If you manage to solve both problem till midnight (IST) your current streak increases. If you don't solve both problems or miss a single day your streak will reset back to 0.
+        If you manage to solve both problem till midnight (UTC) your current streak increases. If you don't solve both problems or miss a single day your streak will reset back to 0.
         The bot will keep track of your streak (current and longest) and there is also a leaderboard for the top contestants.
         """
         await ctx.send_help(ctx.command)
