@@ -159,7 +159,7 @@ class Hard75Challenge(commands.Cog):
             for index, (member, longestStreak, currentStreak) in enumerate(chunk):
                 lstreakstr = f'{longestStreak}' 
                 cstreakstr = f'{currentStreak}' 
-                memberstr  = f'{member}'
+                memberstr  = f'{member.display_name}'
                 t += table.Data(_PER_PAGE * page_num + index + 1,
                                 memberstr, lstreakstr, cstreakstr)
 
