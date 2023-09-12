@@ -161,7 +161,8 @@ class Hard75Challenge(commands.Cog):
                                 mentionstr, lstreakstr, cstreakstr)
 
             table_str = f'```\n{t}\n```'
-            embed = discord_common.cf_color_embed(description=table_str)
+            embed = discord_common.cf_color_embed()
+            embed.add_field("Leaderboard", value = table_str)
             return 'Leaderboard', embed
 
         pages = [make_page(chunk, k) for k, chunk in enumerate(
