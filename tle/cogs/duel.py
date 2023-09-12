@@ -772,7 +772,7 @@ class Dueling(commands.Cog):
                 if (handle is not None):
                     handlestr = handle
                 t += table.Data(_PER_PAGE * page_num + index + 1,
-                                f'{member.display_name}', handlestr, rating_str)
+                                f'{member.mention}', handlestr, rating_str)
 
             table_str = f'```\n{t}\n```'
             embed = discord_common.cf_color_embed(description=table_str)
