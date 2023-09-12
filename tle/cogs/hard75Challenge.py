@@ -156,8 +156,9 @@ class Hard75Challenge(commands.Cog):
             for index, (member, longestStreak, currentStreak) in enumerate(chunk):
                 lstreakstr = f'{longestStreak}' 
                 cstreakstr = f'{currentStreak}' 
+                mentionstr = f"<@!{member}>"
                 t += table.Data(_PER_PAGE * page_num + index + 1,
-                                f"<@!{member}>", lstreakstr, cstreakstr)
+                                mentionstr, lstreakstr, cstreakstr)
 
             table_str = f'```\n{t}\n```'
             embed = discord_common.cf_color_embed(description=table_str)
