@@ -460,11 +460,11 @@ class UserDbConn:
         
     def get_hard75_LeaderBoard(self):
         query1 = '''
-            SELECT user_id FROM hard75_challenge
+            SELECT user_id, longest_streak, current_streak FROM hard75_challenge
             ORDER BY longest_streak DESC , last_updated ASC
-            LIMIT 5
+            LIMIT 100
         '''
-        return self.conn.execute(query1)
+        return self.conn.execute(query1).fetchall()
         
         
 
