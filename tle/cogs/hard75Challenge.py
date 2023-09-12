@@ -177,6 +177,7 @@ class Hard75Challenge(commands.Cog):
         handle, = await cf_common.resolve_handles(ctx, self.converter, ('!' + str(ctx.author),))
         user = cf_common.user_db.fetch_cf_user(handle)
         user_id = ctx.author.id
+        userExists = cf_common.user_db
         activeChallenge= cf_common.user_db.check_Hard75Challenge(user_id)
         if activeChallenge:     # problems are already there simply return from the DB 
             c1_id,p1_id,p1_name,c2_id,p2_id,p2_name=cf_common.user_db.get_Hard75Challenge(user_id)
@@ -224,7 +225,7 @@ class Hard75Challenge(commands.Cog):
         choice2 = max(random.randrange(len(problems2)) for _ in range(5))
         problem1=problems1[choice1]
         problem2=problems2[choice2]
-        res=cf_common.user_db.new_Hard75Challenge(user_id,handle,problem1.index,problem1.contestId,problem1.name,problem2.index,problem2.contestId,problem2.name)
+        res=cf_common.user_db.new_Hard75Challenge(user_id,handle,problem1.index,problem1.contestId,problem1.name,problem2.index,problem2.contestId,problem2.name,user.effective_rating)
         if res!=1:
             raise Hard75CogError("Issues while writing to db please contact ACD team!")
         await self._postProblemEmbed(ctx, handle, problem1,1)
