@@ -160,7 +160,7 @@ class Hard75Challenge(commands.Cog):
                 t += table.Data(_PER_PAGE * page_num + index + 1,
                                 mentionstr, lstreakstr, cstreakstr)
 
-            table_str = f'```\n{t}\n```'
+            table_str = f'\n{t}\n'
             embed = discord_common.cf_color_embed()
             embed.add_field(name = 'Leaderboard', value = table_str, inline = True)
             return 'Leaderboard', embed
