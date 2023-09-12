@@ -162,7 +162,7 @@ class Hard75Challenge(commands.Cog):
 
             table_str = f'```\n{t}\n```'
             embed = discord_common.cf_color_embed()
-            embed.add_field("Leaderboard", value = table_str)
+            embed.add_field(name = 'Leaderboard', value = table_str, inline = True)
             return 'Leaderboard', embed
 
         pages = [make_page(chunk, k) for k, chunk in enumerate(
