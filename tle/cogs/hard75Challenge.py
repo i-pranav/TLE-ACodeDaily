@@ -128,31 +128,16 @@ class Hard75Challenge(commands.Cog):
         """
         Ranklist of the top contestants (based on longest streak)
         """
-        res=cf_common.user_db.get_hard75_LeaderBoard()
-        if res is None: 
-            raise Hard75CogError('No One has completed anything as of now - leaderboard is empty!')
-
         data = [(ctx.guild.get_member(int(user_id)), longest_streak, current_streak)
                  for user_id, longest_streak, current_streak in cf_common.user_db.get_hard75_LeaderBoard()]
-        # names=[]
-        # for r in res:
-        #     names.append(f"<@!{r[0]}>")
-        # rankArr=[0]*len(names)
-        # for i in range(0,len(names)):
-        #     rankArr[i]=str(i+1)
-        # nameslist = '\n'.join(names)
-        # ranklist = '\n'.join(rankArr)
-        # embed=discord.Embed(
-        #     title="Leaderboard",
-        #     color=discord.Color.blue()
-        # )
-        # embed.add_field(name='Rank',value=ranklist,inline=True)
-        # embed.add_field(name='Name',value=nameslist,inline=True)
-        # await ctx.send(embed=embed)
+
+        if not data: 
+            raise Hard75CogError('No One has completed anything as of now - leaderboard is empty!')
+
         _PER_PAGE = 10
 
         def make_page(chunk, page_num):
-            style = table.Style('{:>}  {:<}  {:<}  {:<}')
+            style = table.Style('{:>}  {:<}  {:>}  {:>}')
             t = table.Table(style)
             t += table.Header('#', 'Name', 'Longest streak', 'Current Streak')
             t += table.Line()
