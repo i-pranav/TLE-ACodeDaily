@@ -41,28 +41,13 @@ class Hard75Challenge(commands.Cog):
         """
         await ctx.send_help(ctx.command)
     
-    async def _postProblemEmbed(self, ctx, handle, problem_name, idx):
+    async def _postProblemEmbed(self, ctx, problem_name):
         problem = cf_common.cache2.problem_cache.problem_by_name[problem_name]
         title = f'{problem.index}. {problem.name}'
         desc = cf_common.cache2.contest_cache.get_contest(problem.contestId).name
         embed = discord.Embed(title=title, url=problem.url, description=desc)
         embed.add_field(name='Rating', value=problem.rating)
         await ctx.send(embed=embed)
-
-    # async def _postProblems(self, ctx, handle,contest_id1,idx1,contest_id2,idx2):
-    #     user_id = ctx.author.id
-    #     issue_time = datetime.datetime.now().timestamp()
-    #     now = datetime.datetime.now()
-    #     start_time, end_time = cf_common.get_start_and_end_of_day(now)
-    #     now_time = int(now.timestamp())
-    #     url1 = f'{cf.CONTEST_BASE_URL}{contest_id1}/problem/{idx1}'
-    #     url2 = f'{cf.CONTEST_BASE_URL}{contest_id2}/problem/{idx2}'
-    #     embed = discord.Embed(description="Get your daily task done!")
-    #     embed.add_field(name='Problem 1', value=(url1))
-    #     embed.add_field(name='Problem 2', value=(url2))
-        
-    #     # mention an embed which includes the streak day of the user! 
-    #     await ctx.send(f'You have already been assigned the problems for [`{datetime.datetime.utcnow().strftime("%Y-%m-%d")}`] `{handle}` ', embed=embed)
 
     async def _pickProblem(self, handle, rating, submissions):
         solved = {sub.problem.name for sub in submissions}
@@ -167,10 +152,9 @@ class Hard75Challenge(commands.Cog):
                 await ctx.send(f'You have already completed todays challenge! Life isn\'t just about coding!! Go home, talk to family and friends, touch grass, hit the gym!', embed=embed)
                 return
             #else return that problems have already been assigned.
-            #await self._postProblems(ctx,handle,c1_id,p1_id,c2_id,p2_id)
             await ctx.send(f'You have already been assigned the problems for [`{datetime.datetime.utcnow().strftime("%Y-%m-%d")}`] `{handle}` ')
-            await self._postProblemEmbed(ctx, handle, p1_name, 1)
-            await self._postProblemEmbed(ctx, handle, p2_name, 2)            
+            await self._postProblemEmbed(ctx, p1_name)
+            await self._postProblemEmbed(ctx, p2_name)            
             return
         rating = round(user.effective_rating, -2)
         rating = max(800, rating)
@@ -184,8 +168,8 @@ class Hard75Challenge(commands.Cog):
         if res!=1:
             raise Hard75CogError("Issues while writing to db please contact ACD team!")
         await ctx.send(f'Hard75 problems for `{handle}` [`{datetime.datetime.utcnow().strftime("%Y-%m-%d")}`]')    
-        await self._postProblemEmbed(ctx, handle, problem1.name, 1)
-        await self._postProblemEmbed(ctx, handle, problem2.name, 2)
+        await self._postProblemEmbed(ctx, problem1.name)
+        await self._postProblemEmbed(ctx, problem2.name)
 
     @hard75.command(brief='Mark hard75 problems for today as completed')
     @cf_common.user_guard(group='hard75')
