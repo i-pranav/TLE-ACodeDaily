@@ -96,7 +96,7 @@ class Hard75Challenge(commands.Cog):
         embed.add_field(name='longest streak', value=(longest_streak))
         
         # mention an embed which includes the streak d  ay of the user! 
-        await ctx.send(f'Hi `{handle}`! You have completed your daily challenge for {today} ', embed=embed)
+        await ctx.send(f'Congratulations `{handle}`! You have completed your daily challenge for {today} ', embed=embed)
 
     
     async def _postProblemEmbed(self, ctx, handle, problem,idx):
