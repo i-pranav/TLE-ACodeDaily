@@ -156,7 +156,8 @@ class Hard75Challenge(commands.Cog):
             paginator.chunkify(data, _PER_PAGE))]
         paginator.paginate(self.bot, ctx.channel, pages,
                            wait_time=5 * 60, set_pagenum_footers=True)        
-    
+
+        
     @hard75.command(brief='Get users streak statistics')
     @cf_common.user_guard(group='hard75')
     async def streak(self,ctx):
