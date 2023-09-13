@@ -130,20 +130,19 @@ class Hard75Challenge(commands.Cog):
         embed = discord.Embed(title="Your Hard75 grind!",description="This is what you achieved!")
         res=cf_common.user_db.get_hard75_LeaderBoard()
         if res is None: 
-            raise Hard75CogError('No One has completed anything as of now - leaderboard is empty!')
+            raise Hard75CogError('Nobody has completed anything as of now - leaderboard is empty!')
         names=[]
+        longestStreak=[]
         for r in res:
             names.append(f"<@!{r[0]}>")
-        rankArr=[0]*len(names)
-        for i in range(0,len(names)):
-            rankArr[i]=str(i+1)
+            longestStreak.append(f"{r[1]}")
         nameslist = '\n'.join(names)
-        ranklist = '\n'.join(rankArr)
+        longestStreaklist = '\n'.join(longestStreak)
         embed=discord.Embed(
             title="Leaderboard",
             color=discord.Color.blue()
         )
-        embed.add_field(name='Rank',value=ranklist,inline=True)
+        embed.add_field(name='Longest Streak',value=longestStreaklist,inline=True)
         embed.add_field(name='Name',value=nameslist,inline=True)
         await ctx.send(embed=embed)
     
@@ -224,7 +223,7 @@ class Hard75Challenge(commands.Cog):
         choice2 = max(random.randrange(len(problems2)) for _ in range(5))
         problem1=problems1[choice1]
         problem2=problems2[choice2]
-        res=cf_common.user_db.new_Hard75Challenge(user_id,handle,problem1.index,problem1.contestId,problem1.name,problem2.index,problem2.contestId,problem2.name)
+        res=cf_common.user_db.new_Hard75Challenge(user_id,handle,problem1.index,problem1.contestId,problem1.name,problem2.index,problem2.contestId,problem2.name,user.effective_rating)
         if res!=1:
             raise Hard75CogError("Issues while writing to db please contact ACD team!")
         await self._postProblemEmbed(ctx, handle, problem1,1)

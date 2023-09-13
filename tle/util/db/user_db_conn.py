@@ -137,10 +137,10 @@ class UserDbConn:
             "c2_id"                  INTEGER,
             "p2_id"                  INTEGER,
             "p2_name"                TEXT,
-            "p1_solved"              BOOL,
-            "p2_solved"              BOOL,
             "assigned_date"          TEXT,   
-            "last_updated"           TEXT
+            "last_updated"           TEXT,
+            "rating"                 INTEGER,
+            "start_date"             TEXT
             )      
         ''')
         self.conn.execute('''
@@ -380,8 +380,6 @@ class UserDbConn:
         '''
         return self.conn.execute(query1,(user_id,)).fetchone()
 
-
-    
     def check_Hard75Challenge(self,user_id):
         query1 = '''
             SELECT * FROM hard75_challenge
@@ -417,9 +415,7 @@ class UserDbConn:
         today=datetime.datetime.utcnow().strftime('%Y-%m-%d')
         return self.conn.execute(query1, (user_id,today)).fetchone()
     
-
-
-    def new_Hard75Challenge(self,user_id,handle,p1_id,c1_id,p1_name,p2_id,c2_id,p2_name):   
+    def new_Hard75Challenge(self,user_id,handle,p1_id,c1_id,p1_name,p2_id,c2_id,p2_name,rating):   
         #check for existing record, if exists-> change accordingly else add new row
         query1 = '''
             SELECT current_streak,longest_streak FROM hard75_challenge
@@ -432,37 +428,23 @@ class UserDbConn:
         
         if res is not None:
             query2='''
-            UPDATE hard75_challenge SET p1_id = ?, c1_id = ?, p1_name = ?, p2_id = ?, c2_id = ?, p2_name = ?, assigned_date = ?, p1_solved = ?, p2_solved = ?
+            UPDATE hard75_challenge SET p1_id = ?, c1_id = ?, p1_name = ?, p2_id = ?, c2_id = ?, p2_name = ?, assigned_date = ?
             WHERE user_id = ?
             '''
-            cur.execute(query2,(p1_id,c1_id,p1_name,p2_id,c2_id,p2_name,today,0,0,user_id))
+            cur.execute(query2,(p1_id,c1_id,p1_name,p2_id,c2_id,p2_name,today,user_id))
             #the entire point of using last updated is that a user shouln't be able to get multiple points for the same day. 
             if cur.rowcount!=1:
                 self.conn.rollback()
                 return 0
             self.conn.commit()
             return 1
-        #cleanup the schema post work. added for reference.
-            # 'user_id                TEXT',
-            # 'handle                 TEXT',
-            # 'current_streak         INTEGER',
-            # 'longest_streak         INTEGER',
-            # 'c1_id                  INTEGER',
-            # 'p1_id                  INTEGER',
-            # 'c2_id                  INTEGER',
-            # 'p2_id                  INTEGER',
-            # 'p1_solved              BOOL',
-            # 'p2_solved              BOOL',
-            # 'assigned_date          TEXT',   
-            # 'last_updated           TEXT',
-            # 'PRIMARY KEY (user_id)'      
         query3='''
             INSERT INTO hard75_challenge
-            (user_id, handle, current_streak, longest_streak, c1_id, p1_id, p1_name, c2_id, p2_id, p2_name, p1_solved, p2_solved, assigned_date, last_updated)
+            (user_id, handle, current_streak, longest_streak, c1_id, p1_id, p1_name, c2_id, p2_id, p2_name, assigned_date, last_updated, rating, start_date)
             VALUES
             (?, ?, ?, ?, ?, ?, ?, ?, ? ,?, ?, ?, ?, ?)
         '''
-        cur.execute(query3,(user_id,handle,0,0,c1_id,p1_id,p1_name,c2_id,p2_id,p2_name,0,0,today,0))
+        cur.execute(query3,(user_id,handle,0,0,c1_id,p1_id,p1_name,c2_id,p2_id,p2_name,today,0,rating,today))
         if cur.rowcount!=1:
             self.conn.rollback()
             return 0
@@ -478,9 +460,9 @@ class UserDbConn:
         
     def get_hard75_LeaderBoard(self):
         query1 = '''
-            SELECT user_id FROM hard75_challenge
+            SELECT user_id, longest_streak FROM hard75_challenge
             ORDER BY longest_streak DESC , last_updated ASC
-            LIMIT 5
+            LIMIT 10
         '''
         return self.conn.execute(query1)
         
