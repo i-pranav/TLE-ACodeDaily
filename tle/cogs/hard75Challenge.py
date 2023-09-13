@@ -141,8 +141,7 @@ class Hard75Challenge(commands.Cog):
         def make_page(chunk, page_num):
             style = table.Style('{:>}  {:<}  {:>}  {:>}')
             t = table.Table(style)
-            t += table.Header('', '', 'Longest', 'Current')
-            t += table.Header('#', 'Name', 'streak', 'streak')
+            t += table.Header('#', 'Name', 'Max', 'Curr')
             t += table.Line()
             for index, (member, longestStreak, currentStreak) in enumerate(chunk):
                 lstreakstr = f'{longestStreak}' 
