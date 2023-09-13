@@ -15,6 +15,7 @@ from tle.util import discord_common
 from tle.util.db.user_db_conn import Gitgud
 from tle.util import paginator
 from tle.util import cache_system2
+from tle.util import table
 """
 NOTE : please don't use this class... it's instantiation needs more effort for now coded is added inside the codeforces module. 
 
@@ -125,27 +126,40 @@ class Hard75Challenge(commands.Cog):
     @cf_common.user_guard(group='hard75')    
     async def leaderboard(self,ctx):
         """
-        Ranklist of the top 5 contestants (based on longest streak)
+        Ranklist of the top contestants (based on longest streak)
         """
-        embed = discord.Embed(title="Your Hard75 grind!",description="This is what you achieved!")
-        res=cf_common.user_db.get_hard75_LeaderBoard()
-        if res is None: 
-            raise Hard75CogError('Nobody has completed anything as of now - leaderboard is empty!')
-        names=[]
-        longestStreak=[]
-        for r in res:
-            names.append(f"<@!{r[0]}>")
-            longestStreak.append(f"{r[1]}")
-        nameslist = '\n'.join(names)
-        longestStreaklist = '\n'.join(longestStreak)
-        embed=discord.Embed(
-            title="Leaderboard",
-            color=discord.Color.blue()
-        )
-        embed.add_field(name='Longest Streak',value=longestStreaklist,inline=True)
-        embed.add_field(name='Name',value=nameslist,inline=True)
-        await ctx.send(embed=embed)
-    
+        data = [(ctx.guild.get_member(int(user_id)), longest_streak, current_streak)
+                 for user_id, longest_streak, current_streak in cf_common.user_db.get_hard75_LeaderBoard()]
+        data = [(member, longest_streak, current_streak)
+                 for member, longest_streak, current_streak in data
+                 if member is not None]
+        if not data: 
+            raise Hard75CogError('No One has completed anything as of now - leaderboard is empty!')
+
+        _PER_PAGE = 10
+
+        def make_page(chunk, page_num):
+            style = table.Style('{:>}  {:<}  {:>}  {:>}')
+            t = table.Table(style)
+            t += table.Header('#', 'Name', 'Longest streak', 'Current Streak')
+            t += table.Line()
+            for index, (member, longestStreak, currentStreak) in enumerate(chunk):
+                lstreakstr = f'{longestStreak}' 
+                cstreakstr = f'{currentStreak}' 
+                memberstr  = f'{member.display_name}'
+                t += table.Data(_PER_PAGE * page_num + index + 1,
+                                memberstr, lstreakstr, cstreakstr)
+
+            table_str = f'```\n{t}\n```'
+            embed = discord_common.cf_color_embed(description = table_str)
+            return 'Leaderboard', embed
+
+        pages = [make_page(chunk, k) for k, chunk in enumerate(
+            paginator.chunkify(data, _PER_PAGE))]
+        paginator.paginate(self.bot, ctx.channel, pages,
+                           wait_time=5 * 60, set_pagenum_footers=True)        
+
+        
     @hard75.command(brief='Get users streak statistics')
     @cf_common.user_guard(group='hard75')
     async def streak(self,ctx):
