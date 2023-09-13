@@ -130,7 +130,9 @@ class Hard75Challenge(commands.Cog):
         """
         data = [(ctx.guild.get_member(int(user_id)), longest_streak, current_streak)
                  for user_id, longest_streak, current_streak in cf_common.user_db.get_hard75_LeaderBoard()]
-
+        data = [(member, longest_streak, current_streak)
+                 for member, longest_streak, current_streak in data
+                 if member is not None]
         if not data: 
             raise Hard75CogError('No One has completed anything as of now - leaderboard is empty!')
 
