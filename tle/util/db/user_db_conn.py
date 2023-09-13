@@ -462,7 +462,6 @@ class UserDbConn:
         query1 = '''
             SELECT user_id, longest_streak, current_streak FROM hard75_challenge
             ORDER BY longest_streak DESC , last_updated ASC
-            LIMIT 100
         '''
         return self.conn.execute(query1).fetchall()
         
