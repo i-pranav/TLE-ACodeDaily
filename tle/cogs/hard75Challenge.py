@@ -167,7 +167,10 @@ class Hard75Challenge(commands.Cog):
                 await ctx.send(f'You have already completed todays challenge! Life isn\'t just about coding!! Go home, talk to family and friends, touch grass, hit the gym!', embed=embed)
                 return
             #else return that problems have already been assigned.
-            await self._postProblems(ctx,handle,c1_id,p1_id,c2_id,p2_id)
+            #await self._postProblems(ctx,handle,c1_id,p1_id,c2_id,p2_id)
+            await ctx.send(f'You have already been assigned the problems for [`{datetime.datetime.utcnow().strftime("%Y-%m-%d")}`] `{handle}` ')
+            await self._postProblemEmbed(ctx, handle, p1_name, 1)
+            await self._postProblemEmbed(ctx, handle, p2_name, 2)            
             return
         rating = round(user.effective_rating, -2)
         rating = max(800, rating)
