@@ -47,22 +47,22 @@ class Hard75Challenge(commands.Cog):
         desc = cf_common.cache2.contest_cache.get_contest(problem.contestId).name
         embed = discord.Embed(title=title, url=problem.url, description=desc)
         embed.add_field(name='Rating', value=problem.rating)
-        await ctx.send(f'Hard75 problem`#{idx}` for `{handle}` [`{datetime.datetime.utcnow().strftime("%Y-%m-%d")}`]', embed=embed)
+        await ctx.send(embed=embed)
 
-    async def _postProblems(self, ctx, handle,contest_id1,idx1,contest_id2,idx2):
-        user_id = ctx.author.id
-        issue_time = datetime.datetime.now().timestamp()
-        now = datetime.datetime.now()
-        start_time, end_time = cf_common.get_start_and_end_of_day(now)
-        now_time = int(now.timestamp())
-        url1 = f'{cf.CONTEST_BASE_URL}{contest_id1}/problem/{idx1}'
-        url2 = f'{cf.CONTEST_BASE_URL}{contest_id2}/problem/{idx2}'
-        embed = discord.Embed(description="Get your daily task done!")
-        embed.add_field(name='Problem 1', value=(url1))
-        embed.add_field(name='Problem 2', value=(url2))
+    # async def _postProblems(self, ctx, handle,contest_id1,idx1,contest_id2,idx2):
+    #     user_id = ctx.author.id
+    #     issue_time = datetime.datetime.now().timestamp()
+    #     now = datetime.datetime.now()
+    #     start_time, end_time = cf_common.get_start_and_end_of_day(now)
+    #     now_time = int(now.timestamp())
+    #     url1 = f'{cf.CONTEST_BASE_URL}{contest_id1}/problem/{idx1}'
+    #     url2 = f'{cf.CONTEST_BASE_URL}{contest_id2}/problem/{idx2}'
+    #     embed = discord.Embed(description="Get your daily task done!")
+    #     embed.add_field(name='Problem 1', value=(url1))
+    #     embed.add_field(name='Problem 2', value=(url2))
         
-        # mention an embed which includes the streak day of the user! 
-        await ctx.send(f'You have already been assigned the problems for [`{datetime.datetime.utcnow().strftime("%Y-%m-%d")}`] `{handle}` ', embed=embed)
+    #     # mention an embed which includes the streak day of the user! 
+    #     await ctx.send(f'You have already been assigned the problems for [`{datetime.datetime.utcnow().strftime("%Y-%m-%d")}`] `{handle}` ', embed=embed)
 
     async def _pickProblem(self, handle, rating, submissions):
         solved = {sub.problem.name for sub in submissions}
@@ -183,6 +183,7 @@ class Hard75Challenge(commands.Cog):
         res=cf_common.user_db.new_Hard75Challenge(user_id,handle,problem1.index,problem1.contestId,problem1.name,problem2.index,problem2.contestId,problem2.name,user.effective_rating)
         if res!=1:
             raise Hard75CogError("Issues while writing to db please contact ACD team!")
+        await ctx.send(f'Hard75 problems for `{handle}` [`{datetime.datetime.utcnow().strftime("%Y-%m-%d")}`]')    
         await self._postProblemEmbed(ctx, handle, problem1.name, 1)
         await self._postProblemEmbed(ctx, handle, problem2.name, 2)
 
