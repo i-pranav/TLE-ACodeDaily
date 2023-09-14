@@ -84,15 +84,16 @@ class Hard75Challenge(commands.Cog):
         _PER_PAGE = 10
 
         def make_page(chunk, page_num):
-            style = table.Style('{:>}  {:<}  {:>}')
+            style = table.Style('{:>}  {:<}  {:>} {:>}')
             t = table.Table(style)
-            t += table.Header('#', 'Name', 'Longest(current) streak')
+            t += table.Header('#', 'Name', 'Longest', 'Current')
             t += table.Line()
             for index, (member, longestStreak, currentStreak) in enumerate(chunk):
-                lstreakstr = f'{longestStreak}({currentStreak})' 
+                lstreakstr = f'{longestStreak}' 
+                cstreatstr = f'{currentStreak}' 
                 memberstr  = f'{member.display_name}'
                 t += table.Data(_PER_PAGE * page_num + index + 1,
-                                memberstr, lstreakstr)
+                                memberstr, lstreakstr, cstreatstr)
 
             table_str = f'```\n{t}\n```'
             embed = discord_common.cf_color_embed(description = table_str)
