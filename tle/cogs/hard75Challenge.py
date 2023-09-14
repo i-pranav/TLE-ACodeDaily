@@ -213,7 +213,8 @@ class Hard75Challenge(commands.Cog):
         #check if streak continues!
         if(last_update==yesterday):
             current_streak+=1
-
+        else:
+            current_streak=0
         if(current_streak==0):      # on first day!
             current_streak=1    
 
