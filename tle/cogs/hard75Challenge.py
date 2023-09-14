@@ -98,20 +98,6 @@ class Hard75Challenge(commands.Cog):
             table_str = f'```\n{t}\n```'
             embed = discord_common.cf_color_embed(description = table_str)
             return 'Leaderboard', embed            
-            # style = table.Style('{:>}  {:<}  {:>}  {:>}')
-            # t = table.Table(style)
-            # t += table.Header('#', 'Name', 'Max', 'Curr')
-            # t += table.Line()
-            # for index, (member, longestStreak, currentStreak) in enumerate(chunk):
-            #     lstreakstr = f'{longestStreak}' 
-            #     cstreakstr = f'{currentStreak}' 
-            #     memberstr  = f'{member.display_name}'
-            #     t += table.Data(_PER_PAGE * page_num + index + 1,
-            #                     memberstr, lstreakstr, cstreakstr)
-
-            # table_str = f'```\n{t}\n```'
-            # embed = discord_common.cf_color_embed(description = table_str)
-            # return 'Leaderboard', embed
 
         pages = [make_page(chunk, k) for k, chunk in enumerate(
             paginator.chunkify(data, _PER_PAGE))]
