@@ -138,12 +138,9 @@ class Hard75Challenge(commands.Cog):
         today=datetime.datetime.utcnow().strftime('%Y-%m-%d')
         activeChallenge = cf_common.user_db.check_Hard75Challenge(user_id, today)
         if activeChallenge:     # problems are already there simply return from the DB 
-            c1_id,p1_id,p1_name,c2_id,p2_id,p2_name=cf_common.user_db.get_Hard75Challenge(user_id, today)
-
-            #check if problem is already solved... if so respond appropriately.
-            submissions = await cf.user.status(handle=handle)
-            solved = {sub.problem.name for sub in submissions if sub.verdict == 'OK'}
+            p1_name, p2_name, solved = await self._checkProblemsSolved(handle, user_id, today)
             if p1_name in solved and p2_name in solved:
+                # TODO: make function for it and use beautifier for printing
                 dt = datetime.datetime.now()
                 timeLeft=((24 - dt.hour - 1) * 60 * 60) + ((60 - dt.minute - 1) * 60) + (60 - dt.second)
                 h=int(timeLeft/3600)
@@ -167,10 +164,18 @@ class Hard75Challenge(commands.Cog):
         problem2 = await self._pickProblem(handle, rating2, submissions)
         res=cf_common.user_db.new_Hard75Challenge(user_id,handle,problem1.index,problem1.contestId,problem1.name,problem2.index,problem2.contestId,problem2.name,user.effective_rating, today)
         if res!=1:
-            raise Hard75CogError("Issues while writing to db please contact ACD team!")
+            raise Hard75CogError("Issues while writing to db please contact mod team!")
         await ctx.send(f'Hard75 problems for `{handle}` [`{datetime.datetime.utcnow().strftime("%Y-%m-%d")}`]')    
         await self._postProblemEmbed(ctx, problem1.name)
         await self._postProblemEmbed(ctx, problem2.name)
+
+    async def _checkProblemsSolved(self, handle, user_id, today):
+        c1_id,p1_id,p1_name,c2_id,p2_id,p2_name=cf_common.user_db.get_Hard75Challenge(user_id, today)
+
+            #check if problem is already solved... if so respond appropriately.
+        submissions = await cf.user.status(handle=handle)
+        solved = {sub.problem.name for sub in submissions if sub.verdict == 'OK'}
+        return p1_name,p2_name,solved
 
     @hard75.command(brief='Mark hard75 problems for today as completed')
     @cf_common.user_guard(group='hard75')
@@ -181,20 +186,22 @@ class Hard75Challenge(commands.Cog):
         handle, = await cf_common.resolve_handles(ctx, self.converter, ('!' + str(ctx.author),))
         user_id = ctx.message.author.id
         today=datetime.datetime.utcnow().strftime('%Y-%m-%d')
-        active = cf_common.user_db.check_Hard75Challenge(user_id, today)
-        if not active:
+        activeChallenge = cf_common.user_db.check_Hard75Challenge(user_id, today)
+        if not activeChallenge:
             raise Hard75CogError(f'You have not been assigned any problems today! Use `;hard75 letsgo` to get the pair of problems!')
         
-        submissions = await cf.user.status(handle=handle)
-        solved = {sub.problem.name for sub in submissions if sub.verdict == 'OK'}
-        c1_id,p1_id,p1_name,c2_id,p2_id,p2_name=cf_common.user_db.get_Hard75Challenge(user_id, today)
+        p1_name,p2_name,solved = await self._checkProblemsSolved(handle, user_id, today)
 
         if not p1_name in solved and not p2_name in solved:
+            await self._postProblemEmbed(ctx, p1_name)
+            await self._postProblemEmbed(ctx, p2_name)            
             raise Hard75CogError('You haven\'t completed either of the problems!')
         if not p1_name in solved:
-            raise Hard75CogError('You haven\'t completed the problem1!')
+            await self._postProblemEmbed(ctx, p1_name)
+            raise Hard75CogError('You haven\'t completed problem 1!')
         if not p2_name in solved:
-            raise Hard75CogError('You haven\'t completed the problem2!')
+            await self._postProblemEmbed(ctx, p2_name)
+            raise Hard75CogError('You haven\'t completed problem 2!')
         
         # else update accordingly DB 
         assigned_date,last_update=cf_common.user_db.get_Hard75Date(user_id)
