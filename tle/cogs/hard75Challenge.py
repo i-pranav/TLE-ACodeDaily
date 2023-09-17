@@ -121,7 +121,7 @@ class Hard75Challenge(commands.Cog):
         
     @hard75.command(brief='Get users streak statistics')
     @cf_common.user_guard(group='hard75')
-    async def streak(self,ctx, member: discord.Member):
+    async def streak(self,ctx, member: discord.Member = None):
         """
         See your progress on the challenge 
         """        
