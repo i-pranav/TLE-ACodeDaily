@@ -73,7 +73,7 @@ class Hard75Challenge(commands.Cog):
         return p1_name in solved,p2_name in solved
 
     def _generateStreakEmbed(self, handle, current_streak, longest_streak, last_updated):
-        embed = discord.Embed(title="{handle}s Hard75 grind!")
+        embed = discord.Embed(title=f'{handle}s Hard75 grind!')
         today=datetime.datetime.utcnow().strftime('%Y-%m-%d')
         last_updated_str = "today" if last_updated==today else last_updated
         embed.add_field(name='current streak', value=current_streak)
@@ -129,7 +129,7 @@ class Hard75Challenge(commands.Cog):
         handle, = await cf_common.resolve_handles(ctx, self.converter, ('!' + str(user_id),))
         res=cf_common.user_db.get_hard75_status(user_id)
         if res is None:
-            raise Hard75CogError('{member.display_name} hasn\'t started the Hard75 challenge (`;hard75 letsgo`)')
+            raise Hard75CogError(f'{member.display_name} hasn\'t started the Hard75 challenge (`;hard75 letsgo`)')
         current_streak,longest_streak,last_updated=res
         
         embed = self._generateStreakEmbed(handle, current_streak, longest_streak, last_updated)
