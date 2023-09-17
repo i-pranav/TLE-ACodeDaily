@@ -66,6 +66,20 @@ class Hard75Challenge(commands.Cog):
         problems.sort(key=lambda problem: cf_common.cache2.contest_cache.get_contest(problem.contestId).startTimeSeconds)
         choice = max(random.randrange(len(problems)) for _ in range(5))
         return problems[choice]    
+
+    async def _checkProblemsSolved(self, handle, p1_name, p2_name):
+        submissions = await cf.user.status(handle=handle)
+        solved = {sub.problem.name for sub in submissions if sub.verdict == 'OK'}
+        return p1_name in solved,p2_name in solved
+
+    def _generateStreakEmbed(self, handle, current_streak, longest_streak, last_updated):
+        embed = discord.Embed(title="{handle}s Hard75 grind!")
+        today=datetime.datetime.utcnow().strftime('%Y-%m-%d')
+        last_updated_str = "today" if last_updated==today else last_updated
+        embed.add_field(name='current streak', value=current_streak)
+        embed.add_field(name='longest streak', value=longest_streak)
+        embed.add_field(name='last problem solved', value=last_updated_str)
+        return embed        
     
     @hard75.command(brief='Get Hard75 leaderboard')
     @cf_common.user_guard(group='hard75')    
@@ -107,20 +121,18 @@ class Hard75Challenge(commands.Cog):
         
     @hard75.command(brief='Get users streak statistics')
     @cf_common.user_guard(group='hard75')
-    async def streak(self,ctx):
+    async def streak(self,ctx, member: discord.Member):
         """
         See your progress on the challenge 
         """        
-        user_id=ctx.author.id
+        user_id = member.id if member else ctx.author.id
+        handle, = await cf_common.resolve_handles(ctx, self.converter, ('!' + str(user_id),))
         res=cf_common.user_db.get_hard75_status(user_id)
         if res is None:
-            raise Hard75CogError('You haven\'t completed a Hard75 problem! Get started with `;hard75 letsgo`')
+            raise Hard75CogError('{member.display_name} hasn\'t started the Hard75 challenge (`;hard75 letsgo`)')
         current_streak,longest_streak,last_updated=res
         
-        embed = discord.Embed(title="Your Hard75 grind!",description="This is what you achieved!")
-        embed.add_field(name='current streak', value=current_streak)
-        embed.add_field(name='longest streak', value=longest_streak)
-        embed.add_field(name='last problem solved on', value=last_updated)
+        embed = self._generateStreakEmbed(handle, current_streak, longest_streak, last_updated)
         await ctx.send(f'Thanks for participating in the challenge!', embed=embed)
 
     @hard75.command(brief='Request hard75 problems for today')
@@ -138,8 +150,9 @@ class Hard75Challenge(commands.Cog):
         today=datetime.datetime.utcnow().strftime('%Y-%m-%d')
         activeChallenge = cf_common.user_db.check_Hard75Challenge(user_id, today)
         if activeChallenge:     # problems are already there simply return from the DB 
-            p1_name, p2_name, solved = await self._checkProblemsSolved(handle, user_id, today)
-            if p1_name in solved and p2_name in solved:
+            c1_id,p1_id,p1_name,c2_id,p2_id,p2_name=cf_common.user_db.get_Hard75Challenge(user_id, today)
+            p1_solved, p2_solved = await self._checkProblemsSolved(handle, p1_name, p2_name)
+            if p1_solved and p2_solved:
                 # TODO: make function for it and use beautifier for printing
                 dt = datetime.datetime.now()
                 timeLeft=((24 - dt.hour - 1) * 60 * 60) + ((60 - dt.minute - 1) * 60) + (60 - dt.second)
@@ -169,13 +182,6 @@ class Hard75Challenge(commands.Cog):
         await self._postProblemEmbed(ctx, problem1.name)
         await self._postProblemEmbed(ctx, problem2.name)
 
-    async def _checkProblemsSolved(self, handle, user_id, today):
-        c1_id,p1_id,p1_name,c2_id,p2_id,p2_name=cf_common.user_db.get_Hard75Challenge(user_id, today)
-
-            #check if problem is already solved... if so respond appropriately.
-        submissions = await cf.user.status(handle=handle)
-        solved = {sub.problem.name for sub in submissions if sub.verdict == 'OK'}
-        return p1_name,p2_name,solved
 
     @hard75.command(brief='Mark hard75 problems for today as completed')
     @cf_common.user_guard(group='hard75')
@@ -190,16 +196,17 @@ class Hard75Challenge(commands.Cog):
         if not activeChallenge:
             raise Hard75CogError(f'You have not been assigned any problems today! Use `;hard75 letsgo` to get the pair of problems!')
         
-        p1_name,p2_name,solved = await self._checkProblemsSolved(handle, user_id, today)
+        c1_id,p1_id,p1_name,c2_id,p2_id,p2_name=cf_common.user_db.get_Hard75Challenge(user_id, today)
+        p1_solved,p2_solved = await self._checkProblemsSolved(handle, p1_name, p2_name)
 
-        if not p1_name in solved and not p2_name in solved:
+        if not p1_solved and not p2_solved:
             await self._postProblemEmbed(ctx, p1_name)
             await self._postProblemEmbed(ctx, p2_name)            
             raise Hard75CogError('You haven\'t completed either of the problems!')
-        if not p1_name in solved:
+        if not p1_solved:
             await self._postProblemEmbed(ctx, p1_name)
             raise Hard75CogError('You haven\'t completed problem 1!')
-        if not p2_name in solved:
+        if not p2_solved:
             await self._postProblemEmbed(ctx, p2_name)
             raise Hard75CogError('You haven\'t completed problem 2!')
         
@@ -229,13 +236,10 @@ class Hard75Challenge(commands.Cog):
         if(rc!=1):
             raise Hard75CogError('Some issue while monitoring progress! Please contact the mod team!.')
 
-        #TODO: reuse streak embed
-        embed = discord.Embed(description="Congratulations!!")
-        embed.add_field(name='current streak', value=(current_streak))
-        embed.add_field(name='longest streak', value=(longest_streak))
+        embed = self._generateStreakEmbed(handle, current_streak, longest_streak, today)
         
         # mention an embed which includes the streak day of the user! 
-        await ctx.send(f'Congratulations `{handle}`! You have completed your daily challenge for {today} ', embed=embed)
+        await ctx.send(f'Congratulations `{handle}`! You have completed your daily challenge ', embed=embed)
 
 
 
