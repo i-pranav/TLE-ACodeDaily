@@ -117,7 +117,7 @@ class Hard75Challenge(commands.Cog):
                            wait_time=5 * 60, set_pagenum_footers=True)        
 
         
-    @hard75.command(brief='Get users streak statistics', aliases=['st'])
+    @hard75.command(brief='Get users streak statistics', aliases=['st'], usage='[@member|user_id]')
     @cf_common.user_guard(group='hard75')
     async def streak(self,ctx, member: discord.Member = None):
         """
