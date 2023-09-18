@@ -361,7 +361,6 @@ class UserDbConn:
         self.conn.row_factory = None
         return res
     
-
     def get_Hard75Date(self,user_id):
         # the assumption is that record exists
         # returns the assigned_date and the last_updated date. 
@@ -380,25 +379,23 @@ class UserDbConn:
         '''
         return self.conn.execute(query1,(user_id,)).fetchone()
 
-    def check_Hard75Challenge(self,user_id):
+    def check_Hard75Challenge(self, user_id, date):
         query1 = '''
             SELECT * FROM hard75_challenge
             WHERE user_id = ? AND assigned_date = ?
         '''
-        today=datetime.datetime.utcnow().strftime('%Y-%m-%d')
-        res = self.conn.execute(query1, (user_id,today)).fetchone()
+        res = self.conn.execute(query1, (user_id,date)).fetchone()
         if res is None: #need to start a new challenge! 
             return False
         return True
     
-    def updateStreak_Hard75Challenge(self,user_id,current_streak,longest_streak):
+    def updateStreak_Hard75Challenge(self, user_id, current_streak, longest_streak, date):
         cur = self.conn.cursor()
-        today=datetime.datetime.utcnow().strftime('%Y-%m-%d')
         query1='''
             UPDATE hard75_challenge SET current_streak = ?, longest_streak = ?, last_updated = ?
             WHERE user_id = ?
         '''
-        cur.execute(query1,(current_streak,longest_streak,today,user_id))
+        cur.execute(query1,(current_streak,longest_streak,date,user_id))
         #last updated is set to 0 because it's logic wouldn't interfere this way 
         #the entire point of using last updated is that a user shouln't be able to get multiple points for the same day. 
         if cur.rowcount!=1:
@@ -406,22 +403,21 @@ class UserDbConn:
             return 0
         self.conn.commit()
         return 1
-    def get_Hard75Challenge(self,user_id):
+
+    def get_Hard75Challenge(self, user_id, date):
         query1 = '''
             SELECT c1_id, p1_id, p1_name, c2_id, p2_id, p2_name FROM hard75_challenge
             WHERE user_id = ? AND assigned_date = ?
         '''
         #the execution assumes that it has been validated that the presence of this row was confirmed! 
-        today=datetime.datetime.utcnow().strftime('%Y-%m-%d')
-        return self.conn.execute(query1, (user_id,today)).fetchone()
+        return self.conn.execute(query1, (user_id,date)).fetchone()
     
-    def new_Hard75Challenge(self,user_id,handle,p1_id,c1_id,p1_name,p2_id,c2_id,p2_name,rating):   
+    def new_Hard75Challenge(self,user_id,handle,p1_id,c1_id,p1_name,p2_id,c2_id,p2_name,rating,date):   
         #check for existing record, if exists-> change accordingly else add new row
         query1 = '''
             SELECT current_streak,longest_streak FROM hard75_challenge
             WHERE user_id = ?
         '''
-        today=datetime.datetime.utcnow().strftime('%Y-%m-%d')
 
         cur = self.conn.cursor()
         res=self.conn.execute(query1,(user_id,)).fetchone()
@@ -431,7 +427,7 @@ class UserDbConn:
             UPDATE hard75_challenge SET p1_id = ?, c1_id = ?, p1_name = ?, p2_id = ?, c2_id = ?, p2_name = ?, assigned_date = ?
             WHERE user_id = ?
             '''
-            cur.execute(query2,(p1_id,c1_id,p1_name,p2_id,c2_id,p2_name,today,user_id))
+            cur.execute(query2,(p1_id,c1_id,p1_name,p2_id,c2_id,p2_name,date,user_id))
             #the entire point of using last updated is that a user shouln't be able to get multiple points for the same day. 
             if cur.rowcount!=1:
                 self.conn.rollback()
@@ -444,7 +440,7 @@ class UserDbConn:
             VALUES
             (?, ?, ?, ?, ?, ?, ?, ?, ? ,?, ?, ?, ?, ?)
         '''
-        cur.execute(query3,(user_id,handle,0,0,c1_id,p1_id,p1_name,c2_id,p2_id,p2_name,today,0,rating,today))
+        cur.execute(query3,(user_id,handle,0,0,c1_id,p1_id,p1_name,c2_id,p2_id,p2_name,date,0,rating,date))
         if cur.rowcount!=1:
             self.conn.rollback()
             return 0
@@ -457,7 +453,7 @@ class UserDbConn:
             WHERE user_id = ?
         '''
         return self.conn.execute(query1,(user_id,)).fetchone()
-        
+
     def get_hard75_LeaderBoard(self):
         query1 = '''
             SELECT user_id, longest_streak, current_streak FROM hard75_challenge
