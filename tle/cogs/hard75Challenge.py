@@ -121,7 +121,7 @@ class Hard75Challenge(commands.Cog):
     @cf_common.user_guard(group='hard75')
     async def streak(self,ctx, member: discord.Member = None):
         """
-        See your progress on the challenge 
+        See the progress of @member on the challenge. If member is not given you see your progress.
         """        
         user_id = member.id if member else ctx.author.id
         handle, = await cf_common.resolve_handles(ctx, self.converter, ('!' + str(user_id),))
