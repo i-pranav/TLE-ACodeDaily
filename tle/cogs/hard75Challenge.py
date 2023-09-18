@@ -72,7 +72,7 @@ class Hard75Challenge(commands.Cog):
     def _generateStreakEmbed(self, handle, current_streak, longest_streak, last_updated):
         embed = discord.Embed(title=f'{handle}s Hard75 grind!')
         today=datetime.datetime.utcnow().strftime('%Y-%m-%d')
-        last_updated_str = "never" if last_updated==0 else last_updated
+        last_updated_str = "never" if last_updated=='0' else last_updated
         last_updated_str = "today" if last_updated==today else last_updated_str
         embed.add_field(name='current streak', value=current_streak)
         embed.add_field(name='longest streak', value=longest_streak)
