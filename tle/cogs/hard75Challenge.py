@@ -16,10 +16,6 @@ from tle.util.db.user_db_conn import Gitgud
 from tle.util import paginator
 from tle.util import cache_system2
 from tle.util import table
-"""
-NOTE : please don't use this class... it's instantiation needs more effort for now coded is added inside the codeforces module. 
-
-"""
 
 class Hard75CogError(commands.CommandError):
     pass
@@ -76,13 +72,14 @@ class Hard75Challenge(commands.Cog):
     def _generateStreakEmbed(self, handle, current_streak, longest_streak, last_updated):
         embed = discord.Embed(title=f'{handle}s Hard75 grind!')
         today=datetime.datetime.utcnow().strftime('%Y-%m-%d')
-        last_updated_str = "today" if last_updated==today else last_updated
+        last_updated_str = "never" if last_updated=='0' else last_updated
+        last_updated_str = "today" if last_updated==today else last_updated_str
         embed.add_field(name='current streak', value=current_streak)
         embed.add_field(name='longest streak', value=longest_streak)
         embed.add_field(name='last problem solved', value=last_updated_str)
         return embed        
     
-    @hard75.command(brief='Get Hard75 leaderboard')
+    @hard75.command(brief='Get Hard75 leaderboard', aliases=['lb', 'ranklist'])
     @cf_common.user_guard(group='hard75')    
     async def leaderboard(self,ctx):
         """
@@ -120,11 +117,11 @@ class Hard75Challenge(commands.Cog):
                            wait_time=5 * 60, set_pagenum_footers=True)        
 
         
-    @hard75.command(brief='Get users streak statistics')
+    @hard75.command(brief='Get users streak statistics', aliases=['st'], usage='[@member|user_id]')
     @cf_common.user_guard(group='hard75')
     async def streak(self,ctx, member: discord.Member = None):
         """
-        See your progress on the challenge 
+        See the progress of @member on the challenge. If member is not given you see your progress.
         """        
         user_id = member.id if member else ctx.author.id
         handle, = await cf_common.resolve_handles(ctx, self.converter, ('!' + str(user_id),))
@@ -136,7 +133,7 @@ class Hard75Challenge(commands.Cog):
         embed = self._generateStreakEmbed(handle, current_streak, longest_streak, last_updated)
         await ctx.send(f'Thanks for participating in the challenge!', embed=embed)
 
-    @hard75.command(brief='Request hard75 problems for today')
+    @hard75.command(brief='Request hard75 problems for today', aliases=['start'])
     @cf_common.user_guard(group='hard75')
     async def letsgo(self,ctx):
         """
@@ -184,7 +181,7 @@ class Hard75Challenge(commands.Cog):
         await self._postProblemEmbed(ctx, problem2.name)
 
 
-    @hard75.command(brief='Mark hard75 problems for today as completed')
+    @hard75.command(brief='Mark hard75 problems for today as completed', aliases=['done'])
     @cf_common.user_guard(group='hard75')
     async def completed(self, ctx):
         """
@@ -201,15 +198,18 @@ class Hard75Challenge(commands.Cog):
         p1_solved,p2_solved = await self._checkProblemsSolved(handle, p1_name, p2_name)
 
         if not p1_solved and not p2_solved:
+            await ctx.send('You haven\'t completed any of the problems!')    
             await self._postProblemEmbed(ctx, p1_name)
             await self._postProblemEmbed(ctx, p2_name)            
-            raise Hard75CogError('You haven\'t completed either of the problems!')
+            return
         if not p1_solved:
+            await ctx.send('You haven\'t completed the easy problem!')    
             await self._postProblemEmbed(ctx, p1_name)
-            raise Hard75CogError('You haven\'t completed problem 1!')
+            return
         if not p2_solved:
+            await ctx.send('You haven\'t completed the hard problem!')    
             await self._postProblemEmbed(ctx, p2_name)
-            raise Hard75CogError('You haven\'t completed problem 2!')
+            return
         
         # else update accordingly DB 
         assigned_date,last_update=cf_common.user_db.get_Hard75Date(user_id)
