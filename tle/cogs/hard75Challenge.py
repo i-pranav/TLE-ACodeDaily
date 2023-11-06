@@ -49,7 +49,6 @@ class Hard75Challenge(commands.Cog):
         
     async def _checkAcdProbs(self,rating,submissions):
         solved = {sub.problem.name for sub in submissions}
-        solvedData=[(sub.problem.contestId,sub.problem.index) for sub in submissions]
         problems = [prob for prob in acdProbs.getProblems(rating)
                     if (prob['name'] not in solved)]
 
@@ -60,18 +59,18 @@ class Hard75Challenge(commands.Cog):
             __getattr__ = dict.get
             __setattr__ = dict.__setitem__
             __delattr__ = dict.__delitem__
-        
-        problem=problems[0]
-        dotProblem = dotdict(problem)
-        return dotProblem
+        for problem in problems:
+            if (cf_common.cache2.problem_cache.problem_by_name[problem['name']].rating ==rating
+                and cf_common.cache2.problem_cache.problem_by_name[problem['name']].contestId == problem['contestId']):
+                return dotdict(problem)
+        return {}
     
 
     async def _pickProblem(self, handle, rating, submissions):
         #if a ACD Ladder problem is available then give that!
         acdProblem=await self._checkAcdProbs(rating,submissions)
         if(len(acdProblem)):
-            if(cf_common.cache2.problem_cache.problem_by_name[acdProblem.name].rating==rating):
-                return acdProblem
+            return acdProblem
         solved = {sub.problem.name for sub in submissions}
         problems = [prob for prob in cf_common.cache2.problem_cache.problems
                     if (prob.rating == rating 
