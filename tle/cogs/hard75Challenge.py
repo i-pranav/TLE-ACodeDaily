@@ -13,7 +13,6 @@ from tle.util import codeforces_api as cf
 from tle.util import codeforces_common as cf_common
 from tle.util import discord_common
 from tle.util.db.user_db_conn import Gitgud
-from tle.util import ACDLaddersProblems
 from tle.util import paginator
 from tle.util import cache_system2
 from tle.util import table
