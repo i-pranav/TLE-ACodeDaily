@@ -83,6 +83,7 @@ async def bot_error_handler(ctx, exception):
     elif isinstance(exception, (cf.CodeforcesApiError, commands.UserInputError)):
         await ctx.send(embed=embed_alert(exception))
     else:
+        # just a dummy change for teaching vedant
         msg = 'Ignoring exception in command {}:'.format(ctx.command)
         exc_info = type(exception), exception, exception.__traceback__
         extra = {
